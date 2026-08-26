@@ -156,11 +156,13 @@ const monthOptions = computed(() =>
 
 // 所有体系课次（支持跨体系选课），按体系分组展示
 const allLessonGroups = computed(() =>
-  store.systems.map((s) => ({
-    sysId: s.id,
-    label: `${s.stage}/${s.age} · ${s.name}`,
-    options: s.lessons.slice()
-  }))
+  store.systems
+    .filter((s) => Array.isArray(s.lessons))
+    .map((s) => ({
+      sysId: s.id,
+      label: `${s.stage}/${s.age} · ${s.name}`,
+      options: s.lessons.slice()
+    }))
 )
 
 const teacherLabel = computed(() => {

@@ -53,12 +53,16 @@ const options = computed(() => {
     { label: '休（无课）', value: '__rest__' },
     { label: '＋ 自定义…', value: '__custom__' }
   ]
-  for (const g of props.groups) {
+  for (const g of props.groups || []) {
+    // 防御：保证分组的 options 一定是数组，且只有非空分组才下发，
+    // 避免 Naive Select 组内 options 为 undefined 时崩溃（reading 'forEach'）
+    const list = Array.isArray(g.options) ? g.options : []
+    if (!list.length) continue
     opts.push({
       type: 'group',
-      label: g.label,
-      key: g.sysId,
-      options: g.options.map((l) => ({ label: l, value: l }))
+      label: g.label || String(g.sysId),
+      key: g.sysId ? String(g.sysId) : 'g-' + opts.length,
+      options: list.map((l) => ({ label: l, value: l }))
     })
   }
   return opts
