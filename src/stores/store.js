@@ -5,6 +5,37 @@ function uid() {
   return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8)
 }
 
+// 数据归一化：兜底线上历史/脏数据，保证字段结构稳定，避免生成与组件崩坏
+function toLessonArray(v) {
+  if (Array.isArray(v)) return v.filter((x) => typeof x === 'string' && x.trim())
+  if (v && typeof v === 'object') return Object.values(v).filter((x) => typeof x === 'string' && x.trim())
+  return []
+}
+function normalizeSystems(sys) {
+  return sys.map((s) => ({
+    id: s.id,
+    stage: s.stage || '',
+    category: s.category || s.age || '',
+    age: s.age || '',
+    name: s.name || '',
+    lessons: toLessonArray(s.lessons),
+    nextId: s.nextId != null ? s.nextId : null
+  }))
+}
+function normalizeClasses(cls) {
+  return cls.map((c) => ({
+    id: c.id,
+    sysId: c.sysId,
+    courseLabel: c.courseLabel || '',
+    age: c.age || '',
+    time: c.time || '',
+    teacherId: c.teacherId,
+    room: c.room || '',
+    count: Number(c.count) || 1,
+    ptr: Number(c.ptr) || 0
+  }))
+}
+
 // 明确由机构提供的"体系年龄"（其余体系回退显示其分组的标签）
 const PROSE_AGE = {
   快乐家园: '三岁',
@@ -128,9 +159,9 @@ export const useStore = defineStore('main', {
     },
 
     hydrate(snapshot) {
-      if (snapshot && Array.isArray(snapshot.systems)) this.systems = snapshot.systems
+      if (snapshot && Array.isArray(snapshot.systems)) this.systems = normalizeSystems(snapshot.systems)
       if (snapshot && Array.isArray(snapshot.teachers)) this.teachers = snapshot.teachers
-      if (snapshot && Array.isArray(snapshot.classes)) this.classes = snapshot.classes
+      if (snapshot && Array.isArray(snapshot.classes)) this.classes = normalizeClasses(snapshot.classes)
       if (snapshot && snapshot.drafts) this.drafts = snapshot.drafts
       if (snapshot && snapshot.meta) this.meta = snapshot.meta
     },
