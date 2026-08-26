@@ -1,27 +1,8 @@
 import { defineStore } from 'pinia'
 import rawCatalog from '../data/catalog.json'
 
-const LS_CATALOG = 'cp_catalog_v1'
-const LS_CLASSES = 'cp_classes_v1'
-const LS_TEACHERS = 'cp_teachers_v1'
-const LS_DRAFTS = 'cp_drafts_v1'
-const LS_META = 'cp_meta_v1'
-
 function uid() {
   return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8)
-}
-
-function clone(o) {
-  return JSON.parse(JSON.stringify(o))
-}
-
-function load(key, fallback) {
-  try {
-    const v = localStorage.getItem(key)
-    return v ? JSON.parse(v) : fallback
-  } catch (e) {
-    return fallback
-  }
 }
 
 // 明确由机构提供的"体系年龄"（其余体系回退显示其分组的标签）
@@ -92,65 +73,15 @@ function buildCatalog() {
   return systems
 }
 
-// 系统名 + 学段 + 分组 唯一标识，用于跨会话对账
-function sysKey(s) {
-  return `${s.stage}::${s.category}::${s.name}`
-}
-
 export const useStore = defineStore('main', {
   state: () => {
     const systems = buildCatalog()
     return {
       systems,
-      teachers: load(LS_TEACHERS, [{ id: 't-micro', name: '庞微', nick: '微微' }]),
-      classes: load(LS_CLASSES, [
-        {
-          id: 'c1',
-          sysId: systems.find((s) => sysKey(s) === '学龄::六岁::机械构造一上')?.id || null,
-          courseLabel: '机械构造一上',
-          age: '六岁',
-          time: '二17:00',
-          teacherId: 't-micro',
-          room: '15号',
-          count: 5,
-          ptr: 6
-        },
-        {
-          id: 'c2',
-          sysId: systems.find((s) => sysKey(s) === '学前::4-5岁::百变梦工厂')?.id || null,
-          courseLabel: '百变梦工厂',
-          age: '四岁',
-          time: '三10:00',
-          teacherId: 't-micro',
-          room: '13号',
-          count: 1,
-          ptr: 9
-        },
-        {
-          id: 'c3',
-          sysId: systems.find((s) => sysKey(s) === '学龄::六岁::初级机器人上')?.id || null,
-          courseLabel: '初级机器人上',
-          age: '六岁',
-          time: '三17:00',
-          teacherId: 't-micro',
-          room: '15号',
-          count: 5,
-          ptr: 1
-        },
-        {
-          id: 'c4',
-          sysId: systems.find((s) => sysKey(s) === '学前::4-5岁::梦想建筑师下')?.id || null,
-          courseLabel: '梦想建筑师下',
-          age: '四岁九',
-          time: '四17:00',
-          teacherId: 't-micro',
-          room: '4号',
-          count: 5,
-          ptr: 2
-        }
-      ]),
-      drafts: load(LS_DRAFTS, {}),
-      meta: load(LS_META, {})
+      teachers: [],
+      classes: [],
+      drafts: {},
+      meta: {}
     }
   },
 
@@ -176,13 +107,7 @@ export const useStore = defineStore('main', {
 
   actions: {
     persist() {
-      localStorage.setItem(LS_TEACHERS, JSON.stringify(this.teachers))
-      localStorage.setItem(LS_CLASSES, JSON.stringify(this.classes))
-      localStorage.setItem(LS_DRAFTS, JSON.stringify(this.drafts))
-      localStorage.setItem(LS_META, JSON.stringify(this.meta))
-      // 目录：只持久化用户改动（新增课次、衔接覆盖）
-      localStorage.setItem(LS_CATALOG, JSON.stringify(this.systems))
-      // 项目内持久化（重启后加载），失败不影响本地
+      // 数据统一经 /api/state 存入 MongoDB（云端）。失败不影响当前会话。
       try {
         fetch('/api/state', {
           method: 'POST',
