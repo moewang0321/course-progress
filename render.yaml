@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: course-progress
+    runtime: node
+    plan: free
+    # 装依赖 + 构建 Vue 前端（产出 dist/）
+    buildCommand: npm install && npm run build
+    # 启动 Node 服务（同时托管 dist 静态文件和 /api/state 接口）
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # 敏感值：sync: false 表示值在 Render 面板里手动填，不写入仓库
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB
+        value: course_progress
