@@ -1,27 +1,29 @@
 <template>
   <div class="cell-edit">
-    <template v-if="editing">
-      <input
-        v-model="text"
-        ref="input"
-        class="cell-input"
-        @blur="commit"
-        @keyup.enter="commit"
-        @keyup.esc="cancel"
-      />
-    </template>
-    <select v-else :value="current.mode" @change="onSel" class="cell-select" size="0">
-      <option value="__rest__">休（无课）</option>
-      <option value="__custom__">＋ 自定义…</option>
-      <optgroup v-for="g in groups" :key="g.sysId" :label="g.label">
-        <option v-for="l in g.options" :key="g.sysId + l" :value="l">{{ l }}</option>
-      </optgroup>
-    </select>
+    <n-input
+      v-if="editing"
+      ref="inputEl"
+      v-model:value="text"
+      size="small"
+      placeholder="课次名"
+      @blur="commit"
+      @keyup.enter="commit"
+      @keyup.esc="cancel"
+    />
+    <n-select
+      v-else
+      :value="current.value"
+      :options="options"
+      size="small"
+      :consistent-menu-width="false"
+      @update:value="onSel"
+    />
   </div>
 </template>
 
 <script setup>
 import { computed, nextTick, ref } from 'vue'
+import { NInput, NSelect } from 'naive-ui'
 
 const props = defineProps({
   modelValue: { type: String, default: '' },
@@ -31,30 +33,42 @@ const emit = defineEmits(['update:modelValue', 'custom'])
 
 const editing = ref(false)
 const text = ref('')
-const input = ref(null)
+const inputEl = ref(null)
 
 // 所有体系课次的平铺名单（用于判断所选值是否为"已知课次"）
-const allLessonNames = computed(() =>
-  props.groups.flatMap((g) => g.options)
-)
+const allLessonNames = computed(() => props.groups.flatMap((g) => g.options))
 function isInList(v) {
   return allLessonNames.value.includes(v)
 }
 
 const current = computed(() => {
   const v = props.modelValue
-  if (!v) return { mode: '__rest__', label: '休' }
-  if (isInList(v)) return { mode: v, label: v }
-  return { mode: '__custom__', label: v }
+  if (!v) return { value: '__rest__' }
+  if (isInList(v)) return { value: v }
+  return { value: '__custom__' }
 })
 
-function onSel(e) {
-  const v = e.target.value
+const options = computed(() => {
+  const opts = [
+    { label: '休（无课）', value: '__rest__' },
+    { label: '＋ 自定义…', value: '__custom__' }
+  ]
+  for (const g of props.groups) {
+    opts.push({
+      type: 'group',
+      label: g.label,
+      key: g.sysId,
+      options: g.options.map((l) => ({ label: l, value: l }))
+    })
+  }
+  return opts
+})
+
+function onSel(v) {
   if (v === '__custom__') {
-    // 若当前值是已知课次，则预填为空（重新输入自定义）
     editing.value = true
     text.value = props.modelValue && !isInList(props.modelValue) ? props.modelValue : ''
-    nextTick(() => input.value && input.value.focus())
+    nextTick(() => inputEl.value && inputEl.value.focus())
     return
   }
   emit('update:modelValue', v === '__rest__' ? '' : v)
@@ -78,21 +92,5 @@ function cancel() {
 <style scoped>
 .cell-edit {
   min-width: 96px;
-}
-.cell-select,
-.cell-input {
-  width: 100%;
-  font-size: 12px;
-  padding: 5px 6px;
-  border: 1px solid var(--line-2);
-  border-radius: 4px;
-  background: #fff;
-  font-family: 'PingFang SC', '宋体', serif;
-}
-.cell-input {
-  border-color: var(--accent);
-}
-.cell-select {
-  line-height: 1.2;
 }
 </style>

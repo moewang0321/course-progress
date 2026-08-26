@@ -9,29 +9,36 @@
       <div class="toolbar">
         <span class="field">
           <label>教师</label>
-          <select v-model="teacherId">
-            <option v-for="t in store.teachers" :key="t.id" :value="t.id">
-              {{ store.teacherLabel(t.id) }}
-            </option>
-          </select>
+          <n-select
+            :value="teacherId"
+            :options="teacherOptions"
+            class="field-ctl"
+            @update:value="(v) => (teacherId = v)"
+          />
         </span>
         <span class="field">
           <label>年</label>
-          <select v-model="year">
-            <option v-for="y in years" :key="y" :value="y">{{ y }}年</option>
-          </select>
+          <n-select
+            :value="year"
+            :options="yearOptions"
+            class="field-ctl-sm"
+            @update:value="(v) => (year = v)"
+          />
         </span>
         <span class="field">
           <label>月</label>
-          <select v-model="month">
-            <option v-for="m in 12" :key="m" :value="m">{{ m }}月</option>
-          </select>
+          <n-select
+            :value="month"
+            :options="monthOptions"
+            class="field-ctl-sm"
+            @update:value="(v) => (month = v)"
+          />
         </span>
-        <button class="btn primary" @click="generate">生成进度表</button>
+        <n-button type="primary" @click="generate">生成进度表</n-button>
         <span class="cap">{{ status }}</span>
         <span v-if="current" class="status-inline">已载入 {{ current }} 的草稿</span>
         <span class="spacer"></span>
-        <button class="btn sm" @click="saveDraft">保存草稿</button>
+        <n-button @click="saveDraft">保存草稿</n-button>
       </div>
     </div>
 
@@ -40,7 +47,11 @@
       <div class="wr">
         <div v-for="(w, i) in weeks" :key="w.id" class="wr-item">
           <div class="wr-label">第{{ i + 1 }}周</div>
-          <input type="text" v-model="w.startMd" @blur="normalizeWeek(i)" /> <span class="wr-dash">-</span> <input type="text" v-model="w.endMd" />
+          <div class="wr-fields">
+            <n-input v-model:value="w.startMd" size="small" @blur="normalizeWeek(i)" />
+            <span class="wr-dash">-</span>
+            <n-input v-model:value="w.endMd" size="small" />
+          </div>
         </div>
       </div>
     </div>
@@ -94,12 +105,12 @@
     </div>
 
     <div class="panel action-bar">
-      <button class="btn" @click="goPreview">在线预览</button>
-      <button class="btn primary" @click="goExport">导出 Excel(.xlsx)</button>
+      <n-button @click="goPreview">在线预览</n-button>
+      <n-button type="primary" @click="goExport">导出 Excel(.xlsx)</n-button>
       <span class="cap">文件名：{{ filename }}</span>
       <div class="flex gap8 wrap" style="margin-top: 10px">
-        <label class="cap"><input type="checkbox" v-model="writeBackPtr" /> 导出后按实际排课回写进度</label>
-        <label class="cap"><input type="checkbox" v-model="keepCustom" /> 自定义课次回写体系序列</label>
+        <n-checkbox v-model:checked="writeBackPtr">导出后按实际排课回写进度</n-checkbox>
+        <n-checkbox v-model:checked="keepCustom">自定义课次回写体系序列</n-checkbox>
       </div>
     </div>
   </div>
@@ -107,6 +118,8 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { useMessage } from 'naive-ui'
+import { NButton, NInput, NSelect, NCheckbox } from 'naive-ui'
 import { useStore } from '../stores/store'
 import CellEditor from '../components/CellEditor.vue'
 import { monthWeeks, fmtMD } from '../utils/date'
@@ -116,6 +129,7 @@ import { useRouter } from 'vue-router'
 
 const store = useStore()
 const router = useRouter()
+const message = useMessage()
 
 const teacherId = ref(store.teachers[0]?.id || '')
 const now = new Date()
@@ -132,6 +146,13 @@ const years = computed(() => {
   const y = now.getFullYear()
   return [y - 1, y, y + 1, y + 2, y + 3]
 })
+const teacherOptions = computed(() =>
+  store.teachers.map((t) => ({ label: store.teacherLabel(t.id), value: t.id }))
+)
+const yearOptions = computed(() => years.value.map((y) => ({ label: `${y}年`, value: y })))
+const monthOptions = computed(() =>
+  Array.from({ length: 12 }, (_, i) => ({ label: `${i + 1}月`, value: i + 1 }))
+)
 
 // 所有体系课次（支持跨体系选课），按体系分组展示
 const allLessonGroups = computed(() =>
@@ -218,7 +239,7 @@ function writeBack(row, v) {
 
 function saveDraft() {
   if (!rows.value.length) {
-    alert('请先生成进度表')
+    message.warning('请先生成进度表')
     return
   }
   const draftKey = `${teacherId.value}-${year.value}-${month.value}`
@@ -234,7 +255,7 @@ function saveDraft() {
   }
   store.persist()
   current.value = draftKey
-  alert('草稿已保存')
+  message.success('草稿已保存')
 }
 
 function pushToSession() {
@@ -271,7 +292,7 @@ function pushToSession() {
 
 function goPreview() {
   if (!rows.value.length) {
-    alert('请先生成进度表')
+    message.warning('请先生成进度表')
     return
   }
   pushToSession()
@@ -280,7 +301,7 @@ function goPreview() {
 
 function goExport() {
   if (!rows.value.length) {
-    alert('请先生成进度表')
+    message.warning('请先生成进度表')
     return
   }
   pushToSession()
@@ -295,6 +316,12 @@ watch(teacherId, () => {
 </script>
 
 <style scoped>
+.field-ctl {
+  width: 160px;
+}
+.field-ctl-sm {
+  width: 96px;
+}
 .cap {
   font-size: 12px;
   color: var(--muted);
@@ -321,7 +348,7 @@ watch(teacherId, () => {
 }
 .wr {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 8px;
 }
 .wr-item {
@@ -329,27 +356,36 @@ watch(teacherId, () => {
   border-radius: var(--radius);
   padding: 8px 10px;
   font-size: 12px;
-  background: #fafbfc;
+  background: #fbfaf6;
 }
 .wr-label {
   font-weight: 600;
   color: var(--ink-2);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   font-size: 12px;
+}
+.wr-fields {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.wr-fields .n-input {
+  flex: 1;
 }
 .wr-dash {
   color: var(--muted);
-  margin: 0 2px;
-}
-.wr-item input {
-  width: 62px;
-  font-size: 12px;
-  padding: 4px 6px;
 }
 .action-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .field-ctl,
+  .field-ctl-sm {
+    width: 100%;
+  }
 }
 </style>

@@ -9,159 +9,181 @@
       <div class="toolbar">
         <span class="field">
           <label>学段</label>
-          <select v-model="filter.stage">
-            <option value="">全部</option>
-            <option v-for="s in stages" :key="s" :value="s">{{ s }}</option>
-          </select>
+          <n-select
+            :value="filter.stage"
+            :options="stageOptions"
+            placeholder="全部"
+            class="field-ctl"
+            @update:value="(v) => (filter.stage = v)"
+          />
         </span>
         <span class="field">
           <label>年龄</label>
-          <select v-model="filter.age">
-            <option value="">全部</option>
-            <option v-for="a in ages" :key="a" :value="a">{{ a }}</option>
-          </select>
+          <n-select
+            :value="filter.age"
+            :options="ageOptions"
+            placeholder="全部"
+            class="field-ctl"
+            @update:value="(v) => (filter.age = v)"
+          />
         </span>
         <span class="field">
           <label>关键字</label>
-          <input type="text" v-model="filter.kw" placeholder="体系名 / 课次" />
+          <n-input
+            v-model:value="filter.kw"
+            placeholder="体系名 / 课次"
+            clearable
+            class="field-ctl kw"
+          />
         </span>
-        <span class="cap">{{ filtered.length }} 个体系</span>
+        <span class="count-badge">{{ filtered.length }} 个体系</span>
         <span class="spacer"></span>
-        <button class="btn sm" @click="showAddSystem">新增体系</button>
+        <n-button type="primary" @click="showAddSystem">新增体系</n-button>
       </div>
 
-      <div class="table-wrap">
-        <table class="grid">
-          <thead>
-            <tr>
-              <th>学段</th>
-              <th>年龄</th>
-              <th>体系</th>
-              <th>课次数</th>
-              <th>下一衔接</th>
-              <th style="width: 210px">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <template v-for="s in filtered" :key="s.id">
-              <tr :class="{ 'is-open': expanded === s.id }" @click="toggle(s)">
-                <td><span class="tag">{{ s.stage }}</span></td>
-                <td>{{ s.age }}</td>
-                <td class="sys-name">
-                  <span class="caret">{{ expanded === s.id ? '▾' : '▸' }}</span><b>{{ s.name }}</b>
-                </td>
-                <td>{{ s.lessons.length }} 课</td>
-                <td>
-                  <span class="tag accent">{{ nextName(s) }}</span>
-                </td>
-                <td class="ops" @click.stop>
-                  <button class="btn sm" @click="toggle(s)">{{ expanded === s.id ? '收起' : '查看课次' }}</button>
-                  <button class="btn sm ghost" @click="openEdit(s)">编辑</button>
-                </td>
-              </tr>
-              <tr v-if="expanded === s.id" class="expand-row">
-                <td colspan="6">
-                  <div class="expand-head">
-                    <span class="expand-title">{{ s.name }} · 课次清单</span>
-                    <span class="spacer"></span>
-                    <button class="btn sm ghost" @click="toggle(s)">收起</button>
+      <n-empty v-if="!grouped.length" description="未找到匹配的体系" class="empty" />
+
+      <div class="catalog" v-else>
+        <section v-for="st in grouped" :key="st.stage" class="stage-block">
+          <div class="stage-head">
+            <span class="stage-tag">{{ st.stage }}阶段</span>
+            <span class="stage-count">{{ st.bands.reduce((n, b) => n + b.systems.length, 0) }} 个体系</span>
+          </div>
+
+          <div v-for="b in st.bands" :key="b.band" class="band">
+            <div class="band-head">
+              <span class="band-label">{{ b.band }}龄段</span>
+              <span class="band-count">{{ b.systems.length }} 套体系</span>
+            </div>
+
+            <div class="series-list">
+              <div v-for="s in b.systems" :key="s.id" class="series">
+                <div class="series-head">
+                  <div class="head-left">
+                    <b class="sys-name">{{ s.name }}</b>
+                    <span class="tag">{{ s.stage }}</span>
+                    <span class="tag accent">{{ s.age }}</span>
                   </div>
-                  <div class="lesson-grid">
-                    <div
-                      v-for="(l, i) in s.lessons"
-                      :key="i"
-                      class="lesson-cell"
-                    >
-                      <div class="lc-no">第{{ i + 1 }}课</div>
-                      <div class="lc-name">{{ l }}</div>
-                      <button class="lc-del" title="删除课次" @click="delLesson(s, i)">✕</button>
-                    </div>
+                  <span class="count">{{ s.lessons.length }} 课</span>
+                  <n-button size="small" secondary @click="openEdit(s)">编辑</n-button>
+                </div>
+
+                <div class="series-lessons">
+                  <div v-for="(l, i) in s.lessons" :key="i" class="lesson-chip">
+                    <i class="no">{{ i + 1 }}</i>
+                    <span class="name">{{ l }}</span>
+                    <button class="del" title="删除课次" @click="delLesson(s, i)">✕</button>
                   </div>
-                  <div class="mt16 flex gap8 wrap">
-                    <input type="text" v-model="newLesson" placeholder="新增课次，如：滑翔机" @keyup.enter="addLessonTo(s)" />
-                    <button class="btn sm" @click="addLessonTo(s)">添加课次</button>
+                  <div class="add-chip">
+                    <n-input
+                      v-model:value="inputMap[s.id]"
+                      size="small"
+                      :placeholder="`新增到「${s.name}」…`"
+                      @keyup.enter="addLessonTo(s)"
+                    />
+                    <n-button size="small" @click="addLessonTo(s)">添加</n-button>
                   </div>
-                </td>
-              </tr>
-            </template>
-            <tr v-if="!filtered.length">
-              <td colspan="6" class="empty">未找到匹配的体系</td>
-            </tr>
-          </tbody>
-        </table>
+                </div>
+
+                <div class="series-foot">
+                  <span class="next-label">下期衔接</span>
+                  <span class="next-arrow">→</span>
+                  <span class="next-name">{{ nextName(s) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
 
     <!-- 编辑体系 -->
-    <div class="modal-mask" v-if="editing" @click.self="editing = null">
-      <div class="modal">
-        <div class="modal-title">编辑体系：{{ editing.name }}</div>
-        <div class="form-row">
-          <label>学段</label>
-          <select v-model="editing.stage">
-            <option v-for="s in stages" :key="s" :value="s">{{ s }}</option>
-          </select>
-        </div>
-        <div class="form-row">
-          <label>年龄段</label>
-          <input type="text" v-model="editing.age" placeholder="如 3-4岁 / 一二" />
-        </div>
-        <div class="form-row">
-          <label>体系名称</label>
-          <input type="text" v-model="editing.name" />
-        </div>
-        <div class="form-row">
-          <label>下一衔接体系（留空=自动按同组相邻）</label>
-          <select v-model="editing.nextId">
-            <option :value="null">（自动推算）</option>
-            <option v-for="s in systems" :key="s.id" :value="s.id" :disabled="s.id === editing.id">
-              {{ s.name }}（{{ s.stage }}/{{ s.age }}）
-            </option>
-          </select>
-        </div>
-        <div class="form-actions">
-          <button class="btn" @click="editing = null">取消</button>
-          <button class="btn primary" @click="saveEdit">保存</button>
-        </div>
+    <n-modal
+      v-model:show="editVisible"
+      preset="card"
+      class="form-modal"
+      :title="`编辑体系：${editing?.name || ''}`"
+      :bordered="false"
+    >
+      <div class="form-row">
+        <label>学段</label>
+        <n-select
+          v-model:value="editing.stage"
+          :options="stageOptionsFull"
+        />
       </div>
-    </div>
+      <div class="form-row">
+        <label>年龄段</label>
+        <n-input v-model:value="editing.age" placeholder="如 3-4岁 / 一二" />
+      </div>
+      <div class="form-row">
+        <label>体系名称</label>
+        <n-input v-model:value="editing.name" />
+      </div>
+      <div class="form-row">
+        <label>下一衔接体系（留空=自动按同组相邻）</label>
+        <n-select
+          v-model:value="editing.nextId"
+          clearable
+          :options="nextOptions"
+          placeholder="（自动推算）"
+        />
+      </div>
+      <template #footer>
+        <div class="form-actions">
+          <n-button @click="editVisible = false">取消</n-button>
+          <n-button type="primary" @click="saveEdit">保存</n-button>
+        </div>
+      </template>
+    </n-modal>
 
     <!-- 新增体系 -->
-    <div class="modal-mask" v-if="adding" @click.self="adding = null">
-      <div class="modal">
-        <div class="modal-title">新增体系</div>
-        <div class="form-row">
-          <label>学段</label>
-          <select v-model="newSys.stage">
-            <option v-for="s in stages" :key="s" :value="s">{{ s }}</option>
-          </select>
-        </div>
-        <div class="form-row">
-          <label>年龄段</label>
-          <input type="text" v-model="newSys.age" placeholder="如 3-4岁 / 一二" />
-        </div>
-        <div class="form-row">
-          <label>体系名称</label>
-          <input type="text" v-model="newSys.name" />
-        </div>
-        <div class="form-row">
-          <label>课次（每行一个）</label>
-          <textarea v-model="newSys.lessonText" rows="5" placeholder="每个课次名一行"></textarea>
-        </div>
-        <div class="form-actions">
-          <button class="btn" @click="adding = null">取消</button>
-          <button class="btn primary" @click="createSystem">创建</button>
-        </div>
+    <n-modal
+      v-model:show="addVisible"
+      preset="card"
+      class="form-modal"
+      title="新增体系"
+      :bordered="false"
+    >
+      <div class="form-row">
+        <label>学段</label>
+        <n-select v-model:value="newSys.stage" :options="stageOptionsFull" />
       </div>
-    </div>
+      <div class="form-row">
+        <label>年龄段</label>
+        <n-input v-model:value="newSys.age" placeholder="如 3-4岁 / 一二" />
+      </div>
+      <div class="form-row">
+        <label>体系名称</label>
+        <n-input v-model:value="newSys.name" />
+      </div>
+      <div class="form-row">
+        <label>课次（每行一个）</label>
+        <n-input
+          v-model:value="newSys.lessonText"
+          type="textarea"
+          :rows="5"
+          placeholder="每个课次名一行"
+        />
+      </div>
+      <template #footer>
+        <div class="form-actions">
+          <n-button @click="addVisible = false">取消</n-button>
+          <n-button type="primary" @click="createSystem">创建</n-button>
+        </div>
+      </template>
+    </n-modal>
   </div>
 </template>
 
 <script setup>
 import { computed, reactive, ref } from 'vue'
+import { useMessage } from 'naive-ui'
+import { NButton, NInput, NSelect, NModal, NEmpty } from 'naive-ui'
 import { useStore } from '../stores/store'
 
 const store = useStore()
+const message = useMessage()
 
 const stages = computed(() => {
   const list = store.systems.map((s) => s.stage)
@@ -169,17 +191,31 @@ const stages = computed(() => {
 })
 
 const filter = reactive({ stage: '', age: '', kw: '' })
-const expanded = ref(null)
-const newLesson = ref('')
+const editVisible = ref(false)
+const addVisible = ref(false)
 const editing = ref(null)
-const adding = ref(false)
 const newSys = reactive({ stage: '学前', age: '', name: '', lessonText: '' })
+
+// 每个体系独立的"新增课次"输入框
+const inputMap = reactive({})
 
 const ages = computed(() => {
   let list = store.systems.map((s) => s.age)
   list = [...new Set(list)]
   return list.sort((a, b) => a.localeCompare(b, 'zh'))
 })
+
+const stageOptions = computed(() => [
+  { label: '全部', value: '' },
+  ...stages.value.map((s) => ({ label: s, value: s }))
+])
+const stageOptionsFull = computed(() =>
+  stages.value.map((s) => ({ label: s, value: s }))
+)
+const ageOptions = computed(() => [
+  { label: '全部', value: '' },
+  ...ages.value.map((a) => ({ label: a, value: a }))
+])
 
 const filtered = computed(() => {
   return store.systems.filter((s) => {
@@ -195,23 +231,52 @@ const filtered = computed(() => {
   })
 })
 
+// 按 学段 → 年龄段(分类) 纵向分组
+const grouped = computed(() => {
+  const bands = []
+  const byKey = new Map()
+  for (const s of filtered.value) {
+    const band = s.category || s.age || '其他'
+    const key = s.stage + '|' + band
+    if (!byKey.has(key)) {
+      byKey.set(key, { stage: s.stage, band, systems: [] })
+      bands.push(byKey.get(key))
+    }
+    byKey.get(key).systems.push(s)
+  }
+  const res = []
+  for (const b of bands) {
+    let st = res.find((x) => x.stage === b.stage)
+    if (!st) {
+      st = { stage: b.stage, bands: [] }
+      res.push(st)
+    }
+    st.bands.push(b)
+  }
+  return res
+})
+
+const nextOptions = computed(() =>
+  store.systems.map((s) => ({
+    label: `${s.name}（${s.stage}/${s.age}）`,
+    value: s.id,
+    disabled: s.id === editing.value?.id
+  }))
+)
+
 function nextName(s) {
   const n = store.nextSystem(s.id)
   return n ? n.name : '—'
-}
-
-function toggle(s) {
-  expanded.value = expanded.value === s.id ? null : s.id
 }
 
 function delLesson(s, i) {
   store.removeLesson(s.id, i)
 }
 function addLessonTo(s) {
-  const v = newLesson.value.trim()
+  const v = (inputMap[s.id] || '').trim()
   if (!v) return
   store.addLesson(s.id, v)
-  newLesson.value = ''
+  inputMap[s.id] = ''
 }
 
 function openEdit(s) {
@@ -222,24 +287,26 @@ function openEdit(s) {
     name: s.name,
     nextId: s.nextId
   }
+  editVisible.value = true
 }
 function saveEdit() {
   const e = editing.value
   const s = store.sysById(e.id)
   Object.assign(s, { stage: e.stage, age: e.age, name: e.name, nextId: e.nextId })
   store.persist()
-  editing.value = null
+  editVisible.value = false
+  message.success('已保存')
 }
 
 function showAddSystem() {
   Object.assign(newSys, { stage: '学前', age: '', name: '', lessonText: '' })
-  adding.value = true
+  addVisible.value = true
 }
 function createSystem() {
   const name = newSys.name.trim()
   const age = newSys.age.trim()
   if (!name || !age) {
-    alert('请填写体系名称与年龄段')
+    message.warning('请填写体系名称与年龄段')
     return
   }
   const lessons = newSys.lessonText
@@ -250,84 +317,240 @@ function createSystem() {
     id: 'id-' + Date.now().toString(36),
     stage: newSys.stage,
     age,
+    category: newSys.stage === '学前' ? age + '岁组' : age,
     name,
     lessons,
     nextId: null
   })
   store.persist()
-  adding.value = false
+  addVisible.value = false
+  message.success('已创建')
 }
 </script>
 
 <style scoped>
-.grid tbody tr {
-  cursor: pointer;
+.field-ctl {
+  width: 120px;
 }
-.grid tbody tr.is-open {
-  background: var(--accent-soft);
+.field-ctl.kw {
+  width: 180px;
 }
-.sys-name .caret {
-  display: inline-block;
-  width: 12px;
-  color: var(--muted);
-  margin-right: 2px;
+.count-badge {
+  font-size: 12px;
+  color: var(--ink-2);
+  background: #f2f6f3;
+  border: 1px solid var(--line);
+  padding: 2px 9px;
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
 }
-.ops button + button {
-  margin-left: 6px;
-}
-.expand-row > td {
-  background: #f8faf9;
-  padding: 16px 18px 18px;
-}
-.expand-head {
+
+/* ---------- 纵向分组卡片流 ---------- */
+.catalog {
   display: flex;
-  align-items: baseline;
+  flex-direction: column;
+  gap: 28px;
+}
+.stage-block {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.stage-head {
+  display: flex;
+  align-items: center;
   gap: 12px;
-  margin-bottom: 12px;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 10px;
 }
-.expand-title {
-  font-weight: 600;
-  color: var(--ink);
+.stage-tag {
+  font-size: 15px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  color: #1d3a2d;
 }
-.lesson-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+.stage-count {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.stage-block + .stage-block {
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.band {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.band-head {
+  display: flex;
+  align-items: center;
   gap: 8px;
 }
-.lesson-cell {
-  border: 1px solid var(--line-2);
-  border-radius: var(--radius);
-  padding: 8px 6px;
-  text-align: center;
-  font-size: 12px;
-  position: relative;
-  min-height: 46px;
-  background: #fff;
+.band-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  letter-spacing: 0.02em;
 }
-.lc-no {
-  font-size: 10px;
+.band-count {
+  font-size: 11px;
   color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
-.lc-name {
-  margin-top: 2px;
-  font-weight: 500;
+.band-head::before {
+  content: '';
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.series-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.series {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.16s, box-shadow 0.16s;
+}
+.series:hover {
+  border-color: var(--accent-2);
+  box-shadow: 0 6px 20px -16px rgba(30, 80, 60, 0.35);
+}
+
+.series-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line);
+  background: #fbfcfa;
+}
+.head-left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.sys-name {
+  font-size: 15px;
   color: var(--ink);
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+.count {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.series-lessons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px;
+}
+.lesson-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
+  border: 1px solid var(--line);
+  background: #f6f8f5;
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  transition: border-color 0.12s;
+}
+.lesson-chip:hover {
+  border-color: rgba(31, 122, 92, 0.34);
+}
+.lesson-chip .no {
+  font-style: normal;
+  font-size: 10.5px;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.lesson-chip .name {
   line-height: 1.35;
 }
-.lc-del {
-  position: absolute;
-  top: 3px;
-  right: 4px;
+.lesson-chip .del {
   border: none;
   background: transparent;
   color: var(--muted);
   cursor: pointer;
   font-size: 10px;
-  padding: 2px;
+  padding: 0 2px;
+  opacity: 0;
+  transition: opacity 0.12s, color 0.12s;
 }
-.lc-del:hover {
+.lesson-chip:hover .del {
+  opacity: 1;
+}
+.lesson-chip .del:hover {
   color: var(--danger);
+}
+
+.add-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.add-chip .n-input {
+  width: 170px;
+}
+
+.series-foot {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px 10px;
+  border-top: 1px solid var(--line);
+  background: #f2f5f2;
+}
+.next-label {
+  font-size: 10.5px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+.next-arrow {
+  color: var(--accent);
+  font-size: 13px;
+}
+.next-name {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 500;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.form-modal {
+  width: min(480px, 92vw);
+}
+
+@media (max-width: 768px) {
+  .field-ctl,
+  .field-ctl.kw {
+    width: 100%;
+  }
+  .series-head {
+    flex-wrap: wrap;
+  }
+  .add-chip .n-input {
+    width: 100%;
+  }
 }
 </style>

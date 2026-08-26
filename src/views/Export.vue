@@ -10,13 +10,13 @@
         <span class="tag accent">{{ title }}</span>
         <span class="cap">共 {{ g.rows.length }} 行数据 · {{ g.weeks.length }} 个课周</span>
         <span class="spacer"></span>
-        <button class="btn primary" @click="doExport">导出 Excel(.xlsx)</button>
+        <n-button type="primary" @click="doExport">导出 Excel(.xlsx)</n-button>
         <span class="cap filename">{{ filename }}</span>
       </div>
       <div v-else class="empty">
         尚未生成进度表，请先到「进度生成」选择教师与月份并点击生成。
         <div class="mt16">
-          <button class="btn primary" @click="$router.push('/generate')">去生成</button>
+          <n-button type="primary" @click="$router.push('/generate')">去生成</n-button>
         </div>
       </div>
     </div>
@@ -61,7 +61,11 @@
 
 <script setup>
 import { computed, onMounted } from 'vue'
+import { useMessage } from 'naive-ui'
+import { NButton } from 'naive-ui'
 import { currentGen as g, restoreGen } from '../utils/session'
+
+const message = useMessage()
 
 onMounted(() => {
   restoreGen()
@@ -204,7 +208,7 @@ async function doExport() {
     const { useStore } = await import('../stores/store')
     trackPointerWriteback(useStore())
   }
-  alert('已导出：' + filename.value)
+  message.success('已导出：' + filename.value)
 }
 
 function trackPointerWriteback(st) {
