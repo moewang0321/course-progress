@@ -2,5 +2,6 @@ node_modules
 dist
 *.local
 .DS_Store
-data
+# 运行时数据目录（本地 data/state.json）；注意别误伤 src/data 下的源码目录文件
+/data
 .env
