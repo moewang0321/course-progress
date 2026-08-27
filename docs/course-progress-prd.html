@@ -116,6 +116,30 @@ select,input[type=text],input[type=date]{font-family:inherit;font-size:13px;padd
 select:focus,input:focus{border-color:var(--accent)}
 .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px dashed var(--rule)}
 .chip{font-size:12px;padding:5px 12px;border-radius:20px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+/* catalog card */
+.cat-stage{margin:14px 0 6px;font-size:12.5px;font-weight:700;color:var(--accent);letter-spacing:.04em}
+.cat-stage:first-child{margin-top:0}
+.cat-band{margin-bottom:12px}
+.cat-band-head{font-size:11.5px;color:var(--muted);font-weight:600;margin:10px 0 6px}
+.scard{border:1px solid var(--rule);border-radius:10px;background:var(--bg2);overflow:hidden;margin-bottom:10px}
+.scard-head{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f2f8f5;font-size:13px;cursor:pointer}
+.scard-head:hover{background:#eef6f2}
+.sc-toggle{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border:none;background:transparent;color:var(--muted);cursor:pointer;border-radius:5px}
+.sc-toggle:hover{background:var(--accent-soft);color:var(--accent)}
+.sc-toggle svg{transition:transform .18s}
+.sc-toggle.open svg{transform:rotate(180deg)}
+.sc-name{font-weight:700;color:var(--ink)}
+.sc-meta{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted)}
+.sc-body{padding:12px 14px;border-top:1px solid var(--rule)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.lesson-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);border-radius:6px;padding:4px 9px;font-size:11.5px;background:#f6faf8}
+.lesson-chip .no{font-size:10px;color:var(--accent);font-weight:700}
+.lesson-chip .del{border:none;background:none;color:var(--muted);cursor:pointer;font-size:10px}
+.lesson-chip .del:hover{color:var(--danger)}
+.add-lesson{display:flex;gap:6px;margin-top:10px;align-items:center}
+.add-lesson input{flex:1;max-width:220px;font-size:11.5px;padding:4px 8px}
+.sc-foot{display:flex;align-items:center;gap:6px;padding:8px 14px;border-top:1px solid var(--rule);background:#f6f9f7;font-size:12px;color:var(--muted)}
+.sc-foot b{color:var(--accent);font-weight:600}
 
 /* excel-like preview table */
 .excel{border:1px solid #c9d6d3;border-radius:8px;overflow:hidden;margin-top:10px}
@@ -259,25 +283,27 @@ sup a:hover{text-decoration:underline}
       <h3>4.1 课程体系目录管理</h3>
 
       <div class="demo">
-        <div class="demo-bar"><span class="dots"><i></i><i></i><i></i></span><span class="tag-l">原型 Demo · 课程体系目录（可点击查看课次与衔接）</span></div>
+        <div class="demo-bar"><span class="dots"><i></i><i></i><i></i></span><span class="tag-l">原型 Demo · 课程体系目录（按学段/年龄分组卡片，可折叠展开）</span></div>
         <div class="demo-body">
           <div class="toolbar">
-            <span class="field"><label>学段</label><select id="f-stage" onchange="renderCatalog()"><option>全部</option><option>学前</option><option>学龄</option><option>编程</option></select></span>
-            <span class="field"><label>关键字</label><input type="text" id="f-kw" placeholder="如：机械构造" oninput="renderCatalog()"></span>
+            <span class="field"><label>学段</label><select id="f-stage" onchange="renderCatalog()"><option value="">全部</option><option>学前</option><option>学龄</option></select></span>
+            <span class="field"><label>年龄</label><select id="f-age" onchange="renderCatalog()"><option value="">全部</option></select></span>
+            <span class="field"><label>关键字</label><input type="text" id="f-kw" placeholder="体系名 / 课次" oninput="renderCatalog()"></span>
+            <span class="chip" id="cat-count"></span>
+            <span style="flex:1"></span>
+            <button class="btn" onclick="alert('演示：弹出「新增体系」表单（学段/年龄段/名称/课次）')">新增体系</button>
           </div>
-          <div class="table-wrap" style="max-height:340px">
-            <table id="cat-tbl"><thead><tr><th>学段</th><th>年龄</th><th>体系</th><th>课次数</th><th>下一衔接</th><th>操作</th></tr></thead><tbody id="cat-body"></tbody></table>
-          </div>
-          <div id="cat-detail" class="card" style="margin-top:14px"></div>
-          <div class="demo-cap">点击"查看课次"展开某体系的 12 课次清单与"上/下"学期拆分示意；"下一衔接"为系统推算的下期课程体系。</div>
+          <div id="cat-groups"></div>
+          <div class="demo-cap">按"学段 → 年龄"纵向分组卡片；点击箭头折叠/展开该体系；行内可新增/删除课次，「编辑」打开体系表单，底部显示"下期衔接"。</div>
         </div>
       </div>
 
       <h4>页面布局</h4>
       <ul>
-        <li><b>筛选区</b>：学段下拉、年龄下拉、关键字搜索，快速定位体系。</li>
-        <li><b>目录列表</b>：每行一个体系，展示学段 / 年龄 / 体系名 / 课次总数 / 下一衔接体系 / 操作（查看课次、编辑）。</li>
-        <li><b>课次详情抽屉</b>：展开后按顺序列出第 1–12 课次名称，标注"上(1–6)/下(7–12)"学期归属<span class="tag amber">假设</span>，并显示该体系的"下一衔接"。</li>
+        <li><b>筛选区</b>：学段下拉、年龄下拉、关键字搜索、结果数量徽标、「新增体系」按钮。</li>
+        <li><b>目录列表（分组卡片流）</b>：按「学段 → 年龄分类」二级纵向分组，每组内每个体系为一张卡片：头部（折叠/展开箭头 + 体系名 + 学段/年龄标签 + 课次数 + 编辑）、展开体（课次清单可删 + 行内新增课次）、底部（下期衔接）。</li>
+        <li><b>体系折叠展开</b>：每个体系卡片可折叠/展开，折叠后仅保留头部。</li>
+        <li><b>弹窗</b>：编辑体系、新增体系（学段 / 年龄段 / 名称 / 课次按行录入）。</li>
       </ul>
 
       <h4>业务逻辑</h4>
@@ -304,27 +330,32 @@ sup a:hover{text-decoration:underline}
       <h3>4.2 班级与进度管理</h3>
 
       <div class="demo">
-        <div class="demo-bar"><span class="dots"><i></i><i></i><i></i></span><span class="tag-l">原型 Demo · 班级台账与进度指针（演示推进指针）</span></div>
+        <div class="demo-bar"><span class="dots"><i></i><i></i><i></i></span><span class="tag-l">原型 Demo · 班级台账与进度指针（推进指针 / 管理教师 / 新增班级）</span></div>
         <div class="demo-body">
           <div class="toolbar">
-            <span class="field"><label>教师</label><select><option>庞微（微微）</option><option>全部教师</option></select></span>
-            <span class="chip">共 4 个班级</span>
+            <span class="field"><label>教师</label><select onchange="document.getElementById('cls-count').textContent='共 '+this.value==='全部教师'?CLASSES.length+' 个班级':'共 4 个班级'"><option>全部教师</option><option selected>庞微（微微）</option></select></span>
+            <span class="chip" id="cls-count">共 4 个班级</span>
+            <span style="flex:1"></span>
+            <button class="btn" onclick="alert('教师管理（演示）：新增教师姓名/昵称、教师列表与删除')">管理教师</button>
+            <button class="btn primary" onclick="alert('新增班级（演示）：可同步参照班级一键复制课程与进度')">新增班级</button>
           </div>
           <div class="table-wrap" style="max-height:none">
             <table>
-              <thead><tr><th>课程名称</th><th>年龄</th><th>上课时间</th><th>教师</th><th>教室</th><th>人数</th><th>进度指针</th><th>下一课次</th></tr></thead>
+              <thead><tr><th>课程名称</th><th>年龄</th><th>上课时间</th><th>教师</th><th>教室</th><th>人数</th><th>体系</th><th>进度指针</th><th>下一课次</th><th>操作</th></tr></thead>
               <tbody id="cls-body"></tbody>
             </table>
           </div>
-          <div class="demo-cap">进度指针条显示"已上/总课次"，绿色为已完成；点击"推进 1 课"模拟一次课后指针前进——这正是下月推荐的起点。</div>
+          <div class="demo-cap">进度指针条显示"已上/总课次"；点击"推进 1 课"模拟课后指针前进——正是下月推荐的起点；每行可"编辑/删除"，顶部可"管理教师/新增班级"。</div>
         </div>
       </div>
 
       <h4>页面布局</h4>
       <ul>
-        <li><b>班级台账</b>：按教师过滤，列出其全部班级。每行 = 课程名称 / 年龄 / 上课时间 / 教师 / 教室 / 人数 / 进度指针 / 下一课次。</li>
+        <li><b>筛选区</b>：教师下拉、班级数量徽标、「管理教师」「新增班级」按钮。</li>
+        <li><b>班级台账</b>：按教师过滤，列出其全部班级。每行 = 课程名称 / 年龄 / 上课时间 / 教师 / 教室 / 人数 / 体系 / 进度指针 / 下一课次 / 操作。</li>
         <li><b>进度指针可视化</b>：以进度条呈现"已上 N / 总 M 课次"，直观看到各班当前位置。</li>
-        <li><b>课后登记入口</b>：每次上完课，教师"推进 1 课"使指针 +1；也可批量回写多周。</li>
+        <li><b>操作列</b>：每行「推进 1 课 / 编辑 / 删除」；推进使指针 +1 并更新下一课次。</li>
+        <li><b>弹窗</b>：新增/编辑班级（可选同步参照班级、绑定体系、课程/年龄/时间/教师/教室/人数/当前进度）；教师管理（新增教师、教师列表与删除）。</li>
       </ul>
 
       <h4>业务逻辑</h4>
@@ -341,9 +372,13 @@ sup a:hover{text-decoration:underline}
         <div class="demo-body">
           <div class="toolbar">
             <span class="field"><label>教师</label><select id="g-teacher"><option>庞微（微微）</option></select></span>
-            <span class="field"><label>月份</label><select id="g-month"><option>2026年9月</option><option>2026年7月</option></select></span>
+            <span class="field"><label>年</label><select id="g-year"><option>2026</option><option>2025</option></select></span>
+            <span class="field"><label>月</label><select id="g-month" onchange="document.getElementById('g-draft').style.display='none'"><option>2026年9月</option><option>2026年7月</option></select></span>
             <button class="btn primary" onclick="generate()">⚡ 生成进度表</button>
             <span class="chip" id="g-status">未生成</span>
+            <span class="chip" id="g-draft" style="display:none"></span>
+            <span style="flex:1"></span>
+            <button class="btn" onclick="alert('草稿已保存（演示）')">保存草稿</button>
           </div>
           <div class="wr" id="week-ranges"></div>
           <div class="table-wrap" style="max-height:none">
@@ -362,15 +397,15 @@ sup a:hover{text-decoration:underline}
 
       <h4>页面布局</h4>
       <ul>
-        <li><b>生成条件区</b>：教师选择、月份选择、"生成进度表"按钮、生成状态提示。</li>
-        <li><b>五周日期范围区</b>：自动按所选月份推算每周起止日期（如 9 月→第一周 9.1-9.6 … 第五周 9.29-10.4），可手动微调。</li>
-        <li><b>进度表编辑区</b>：每行一个班级，前六列（课程/年龄/时间/教师/教室/人数）自动带入台账；五周列填"日期+课次名"，课次默认来自系统推荐，<mark class="key">每格可下拉切换为本体系其他课次或自定义输入</mark>；最右"下期课程体系"自动填衔接体系。</li>
-        <li><b>操作区</b>：在线预览、导出 Excel、保存草稿。</li>
+        <li><b>生成条件区</b>：教师、年份、月份下拉 + "生成进度表"按钮 + 生成状态提示；已载入草稿时显示"已载入 X 的草稿"；右侧「保存草稿」。</li>
+        <li><b>五周日期范围区</b>：提示"每周二~周日、周一休息"，自动按所选月份推算每周起止日期（如 9 月→第一周 9.1-9.6 … 第五周 9.29-10.4），每周"起-止"两个输入框可手动微调。</li>
+        <li><b>进度表编辑区</b>：每行一个班级，前六列（课程/年龄/时间/教师/教室/人数）自动带入台账；五周列填"日期+课次名"，课次默认来自系统推荐，<mark class="key">每格可下拉切换为本体系/跨体系课次、自定义输入或休课</mark>；最右"下期课程体系"自动填衔接。表格可横向滚动、文字不换行。</li>
+        <li><b>操作区</b>：在线预览、导出 Excel、文件名提示，以及两个回写选项（导出后按实际排课回写进度、自定义课次回写体系序列）。</li>
       </ul>
 
       <h4>业务逻辑</h4>
       <p>选定教师与月份后，系统遍历该教师全部班级：从每班进度指针出发，按其体系课次序列向后依次取 5 个课次，分别落入第一至第五周列，并前置对应周的具体日期（按上课时间所在的周匹配日期）。例如某班指针在第 7 课、体系为"机械构造一"，则推荐第 7–11 课填入五周。<mark class="key">教师可逐格修改推荐课次</mark>：改为同体系其他课次，或输入自定义课次（自定义课次会回写进体系序列）。修改不影响指针本身，仅在导出时可选"按实际排课回写指针"。</p>
-      <p>"下期课程体系"列取该班级体系在目录中的"下一衔接体系"，若当前体系本月将上完（指针 +5 ≥ 总课次），则标注衔接体系并提示"本月结业、下月开新课"。<mark class="key">月份切换会重新推算五周日期范围与各班课次</mark>，确保跨月连续。若某班某周无课（节假日），该格置空或标注"休"，系统按上课时间所在周自动判定是否落在假期。</p>
+      <p>"下期课程体系"列取该班级体系在目录中的"下一衔接体系"。<mark class="key">月份切换会重新推算五周日期范围与各班课次</mark>，确保跨月连续。若某班某周无课，该格显示"休"或"无课"。</p>
 
       <div class="table-wrap" style="max-height:none">
         <table>
@@ -414,7 +449,8 @@ sup a:hover{text-decoration:underline}
 
       <h4>页面布局</h4>
       <ul>
-        <li><b>预览区</b>：以 Excel 视觉呈现最终表，含合并标题行、表头、数据行，所见即所得。</li>
+        <li><b>顶栏</b>：标题标签、数据量提示（"X 行数据 · Y 个课周"）、导出按钮、文件名提示；未生成时显示引导并置「去生成」入口跳回工作台。</li>
+        <li><b>预览区</b>：以 Excel 视觉呈现最终表，含合并标题行、表头、数据行，所见即所得；人数 ≥ 6 的单元格红底提醒。</li>
         <li><b>导出操作</b>：一键导出 .xlsx；文件名 = "{教师昵称}{年}{月}进度.xlsx"。</li>
       </ul>
 
@@ -489,29 +525,58 @@ function findSys(name){return CATALOG.find(function(c){return c.name===name})||C
 /* 4.1 catalog */
 function renderCatalog(){
   var stage=document.getElementById('f-stage').value;
+  var age=document.getElementById('f-age').value;
   var kw=(document.getElementById('f-kw').value||'').trim();
-  var body=document.getElementById('cat-body');
-  body.innerHTML='';
-  CATALOG.filter(function(c){
-    return (stage==='全部'||c.stage===stage)&&(!kw||c.name.indexOf(kw)>=0||c.lessons.join(',').indexOf(kw)>=0);
-  }).forEach(function(c){
-    var tr=document.createElement('tr');
-    tr.innerHTML='<td>'+c.stage+'</td><td>'+c.age+'</td><td><b>'+c.name+'</b></td><td>'+c.lessons.length+'课</td><td>'+(c.next||'—')+'</td><td><button class="btn sm" onclick="showDetail(\''+c.name+'\')">查看课次</button></td>';
-    body.appendChild(tr);
+  var groups=document.getElementById('cat-groups');
+  function hit(c){
+    return (stage===''||c.stage===stage)&&(age===''||c.age===age)&&(!kw||c.name.indexOf(kw)>=0||c.lessons.join(',').indexOf(kw)>=0);
+  }
+  var list=CATALOG.filter(hit);
+  document.getElementById('cat-count').textContent='共 '+list.length+' 个体系';
+  var stages=[];
+  list.forEach(function(c){
+    var st=stages.find(function(s){return s.stage===c.stage;});
+    if(!st){st={stage:c.stage,bands:[]};stages.push(st);}
+    var b=st.bands.find(function(x){return x.age===c.age;});
+    if(!b){b={age:c.age,items:[]};st.bands.push(b);}
+    b.items.push(c);
   });
-}
-function showDetail(name){
-  var c=findSys(name);
-  var html='<h4>体系：'+c.name+'（'+c.stage+' / '+c.age+'）</h4>';
-  html+='<p style="font-size:13px;color:var(--muted);margin-bottom:10px">下一衔接体系：<b style="color:var(--accent)">'+(c.next||'—')+'</b>　|　默认学期拆分：<span class="tag amber">假设</span> 上=1-6课、下=7-12课</p>';
-  html+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px">';
-  c.lessons.forEach(function(l,i){
-    var half=i<6?'上':'下';
-    html+='<div style="border:1px solid var(--rule);border-radius:6px;padding:6px 4px;text-align:center;font-size:11.5px;background:'+(half==='上'?'var(--accent-soft)':'var(--amber-soft)')+'"><div style="color:var(--muted);font-size:10px">第'+(i+1)+'课</div><div style="margin-top:2px">'+l+'</div><div style="font-size:9px;color:var(--muted);margin-top:2px">'+half+'</div></div>';
+  var html='';
+  stages.forEach(function(st){
+    html+='<div class="cat-stage">'+st.stage+'阶段</div>';
+    st.bands.forEach(function(b){
+      html+='<div class="cat-band"><div class="cat-band-head">'+b.age+'龄段 · '+b.items.length+' 套体系</div>';
+      b.items.forEach(function(c){
+        var id='sys-'+c.name;
+        html+='<div class="scard"><div class="scard-head" id="'+id+'-hd">'
+          +'<span class="sc-toggle open"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg></span>'
+          +'<span class="sc-name">'+c.name+'</span>'
+          +'<span class="tag">'+c.stage+'</span><span class="tag teal">'+c.age+'</span>'
+          +'<span class="sc-meta">'+c.lessons.length+'课 <button class="btn sm" onclick="event.stopPropagation();alert(\'编辑体系：'+c.name+'\')">编辑</button></span>'
+          +'</div>'
+          +'<div class="sc-body" id="'+id+'-body"><div class="chips">';
+        c.lessons.forEach(function(l,li){
+          html+='<span class="lesson-chip"><i class="no">'+(li+1)+'</i>'+l+'<button class="del" onclick="event.stopPropagation();delLesson(\''+c.name+'\','+li+')">✕</button></span>';
+        });
+        html+='</div><div class="add-lesson"><input placeholder="新增到「'+c.name+'」…" onkeydown="if(event.key===\'Enter\')addLesson(\''+c.name+'\',this)"><button class="btn sm" onclick="addLesson(\''+c.name+'\',this.previousElementSibling)">添加</button></div></div>'
+          +'<div class="sc-foot">下期衔接 → <b>'+(c.next||'—')+'</b></div></div>';
+      });
+    });
   });
-  html+='</div>';
-  document.getElementById('cat-detail').innerHTML=html;
+  groups.innerHTML=html;
+  var hd=groups.querySelectorAll('.scard-head');
+  for(var i=0;i<hd.length;i++){hd[i].addEventListener('click',toggleSys);}
 }
+function toggleSys(e){
+  var card=e.currentTarget.closest('.scard');
+  var body=card.querySelector('.sc-body');
+  var chev=card.querySelector('.sc-toggle');
+  var open=body.style.display!=='none';
+  body.style.display=open?'none':'';
+  chev.classList.toggle('open',!open);
+}
+function delLesson(name,i){findSys(name).lessons.splice(i,1);renderCatalog();}
+function addLesson(name,inp){var v=(inp.value||'').trim();if(!v)return;findSys(name).lessons.push(v);inp.value='';renderCatalog();}
 
 /* 4.2 classes */
 function renderClasses(){
@@ -521,9 +586,10 @@ function renderClasses(){
     var pct=Math.round(c.ptr/c.total*100);
     var nextLesson=findSys(c.sys).lessons[c.ptr]||'已完成';
     var tr=document.createElement('tr');
-    tr.innerHTML='<td><b>'+c.course+'</b></td><td>'+c.age+'</td><td>'+c.time+'</td><td>'+c.teacher+'</td><td>'+c.room+'</td><td>'+c.count+'</td>'
+    tr.innerHTML='<td><b>'+c.course+'</b></td><td>'+c.age+'</td><td>'+c.time+'</td><td>'+c.teacher+'</td><td>'+c.room+'</td><td>'+c.count+'</td><td><span class="tag">'+c.sys+'</span></td>'
       +'<td><div class="ptr"><div class="track"><div class="fill" style="width:'+pct+'%"></div></div><span class="lbl">'+c.ptr+'/'+c.total+'</span></div></td>'
-      +'<td><span class="tag teal">'+nextLesson+'</span> <button class="btn sm" onclick="advance('+i+')">推进1课</button></td>';
+      +'<td><span class="tag teal">'+nextLesson+'</span></td>'
+      +'<td><div style="display:flex;gap:6px;white-space:nowrap"><button class="btn sm" onclick="advance('+i+')">推进 1 课</button><button class="btn sm" onclick="alert(\'编辑班级：'+c.course+'\')">编辑</button><button class="btn sm" style="color:var(--danger)" onclick="alert(\'删除班级：'+c.course+'\')">删除</button></div></td>';
     body.appendChild(tr);
   });
 }
@@ -556,6 +622,8 @@ function generate(){
     body.appendChild(tr);
   });
   document.getElementById('g-status').textContent='已生成 '+CLASSES.length+' 个班级';
+  var gd=document.getElementById('g-draft');gd.style.display='inline-block';
+  gd.textContent='已载入 '+(month.indexOf('9月')>=0?'2026年9月':'2026年7月')+' 的草稿';
   renderPreview();
 }
 function renderPreview(){
@@ -580,7 +648,12 @@ function scrollPre(){document.getElementById('preview').scrollIntoView({behavior
 function fakeExport(){var m=document.getElementById('g-month').value;var y=m.indexOf('9月')>=0?'9月':'7月';alert('已导出：微微2026年'+y+'进度.xlsx（演示）');}
 
 /* init */
-renderCatalog();showDetail('机械构造一');renderClasses();renderPreview();
+(function(){
+  var sel=document.getElementById('f-age');var ages=[];
+  CATALOG.forEach(function(c){if(ages.indexOf(c.age)<0)ages.push(c.age);});
+  ages.forEach(function(a){var o=document.createElement('option');o.textContent=a;o.value=a;sel.appendChild(o);});
+  renderCatalog();renderClasses();renderPreview();
+})();
 
 /* TOC active highlight */
 var tocLinks=document.querySelectorAll('#toc a');

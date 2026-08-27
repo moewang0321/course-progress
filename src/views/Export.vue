@@ -233,12 +233,13 @@ function trackPointerWriteback(st) {
 <style scoped>
 .cap {
   font-size: 12px;
-  color: #708099;
+  color: var(--muted);
+  font-family: var(--mono);
 }
 
 .filename {
-  color: var(--accent);
-  font-weight: 600;
+  color: var(--memphis-tertiary);
+  font-weight: 700;
 }
 
 .action-bar {
@@ -249,8 +250,8 @@ function trackPointerWriteback(st) {
 }
 
 .excel {
-  border: 1px solid #c9d6d3;
-  border-radius: 8px;
+  border: 2px solid var(--memphis-border);
+  border-radius: 0;
   overflow: auto;
 }
 
@@ -263,7 +264,7 @@ function trackPointerWriteback(st) {
 
 .excel th,
 .excel td {
-  border: 1px solid #d9e4e1;
+  border: 1px solid var(--memphis-border);
   padding: 7px 8px;
   text-align: left;
   white-space: nowrap;
@@ -274,11 +275,22 @@ function trackPointerWriteback(st) {
   font-size: 14px;
   text-align: center;
   padding: 12px;
+  color: var(--memphis-secondary);
+  background: var(--memphis-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .excel .head-row th {
   font-weight: 700;
   font-size: 12px;
+  text-transform: uppercase;
+  background: var(--memphis-text);
+  color: var(--memphis-secondary);
+}
+
+.excel tbody tr:nth-child(even) td {
+  background: rgba(255, 210, 63, 0.22);
 }
 
 .excel .lesson {
@@ -286,11 +298,13 @@ function trackPointerWriteback(st) {
 }
 
 .excel .next {
-  color: var(--accent);
-  font-weight: 600;
+  color: var(--memphis-accent);
+  font-weight: 700;
 }
 
 .excel td.over {
   background: #ff0000;
+  color: #fff;
+  font-weight: 700;
 }
 </style>

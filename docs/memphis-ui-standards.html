@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>孟菲斯·撞色 — UI设计标准文档</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;family=Space+Mono:wght@400;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+/* ===== 基础 ===== */
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins','Noto Sans SC',sans-serif;font-size:14px;background:#FCFCFC;color:#1B1B1B;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ===== 导航 ===== */
+.top-nav{position:fixed;top:0;left:0;right:0;height:52px;background:#1B1B1B;display:flex;align-items:center;padding:0 32px;z-index:1000}
+.top-nav .brand{font-size:16px;font-weight:800;color:#FFD23F;letter-spacing:.5px;font-family:'Poppins',sans-serif;text-transform:uppercase}
+.top-nav .sub{font-size:11px;color:#666;margin-left:12px;font-family:'Space Mono',monospace}
+.top-nav nav{margin-left:auto;display:flex;gap:2px}
+.top-nav nav a{color:#888;text-decoration:none;font-size:12px;padding:6px 14px;border-radius:0;transition:all .2s;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.top-nav nav a:hover{color:#FFD23F;background:#2A2A2A}
+
+/* ===== 布局 ===== */
+.container{max-width:1100px;margin:0 auto;padding:0 32px}
+.section{padding:48px 0;border-bottom:2px solid #1B1B1B}
+
+/* ===== Hero ===== */
+.hero{margin-top:52px;padding:64px 0 48px;background:#1B1B1B;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-20px;right:-20px;width:120px;height:120px;background:#FF6B35;border-radius:50%}
+.hero::after{content:'';position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;background:#004E89;transform:rotate(45deg)}
+.hero-inner{position:relative;z-index:1}
+.hero h1{font-size:44px;font-weight:800;color:#FFD23F;letter-spacing:-1px;margin-bottom:12px;text-transform:uppercase}
+.hero .lead{font-size:15px;color:#AAA;max-width:680px;margin:0 auto;line-height:1.8}
+.hero .tags{display:flex;gap:10px;margin-top:20px;justify-content:center;flex-wrap:wrap}
+.hero .tags span{font-size:11px;padding:5px 16px;border:2px solid #FFD23F;color:#FFD23F;font-family:'Space Mono',monospace;font-weight:700;text-transform:uppercase}
+
+/* ===== 章节标题 ===== */
+.sec-head{margin-bottom:28px}
+.sec-num{font-size:13px;font-weight:700;font-family:'Space Mono',monospace;color:#FF6B35;text-transform:uppercase;letter-spacing:1px}
+.sec-title{font-size:28px;font-weight:800;color:#1B1B1B;margin-top:4px;text-transform:uppercase;letter-spacing:-.3px}
+.sec-desc{font-size:14px;color:#4A4A4A;margin-top:8px;max-width:780px;line-height:1.8}
+
+/* ===== 代码块 ===== */
+.code-block{background:#1B1B1B;border:2px solid #1B1B1B;box-shadow:6px 6px 0 #FF6B35;border-radius:0;overflow:hidden;margin:16px 0 24px}
+.code-head{background:#2A2A2A;padding:10px 16px;display:flex;justify-content:space-between;align-items:center}
+.code-head .lang{font-size:11px;color:#888;font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:1px}
+.code-head .copy{font-size:11px;color:#FF6B35;font-family:'Space Mono',monospace;cursor:pointer;text-transform:uppercase;font-weight:700}
+.code-body{padding:16px 20px;overflow-x:auto}
+.code-body pre{font-family:'Space Mono',monospace;font-size:12.5px;line-height:1.7;color:#E8E8E8;white-space:pre-wrap;word-break:break-word}
+.code-body .tok-var{color:#FFD23F}
+.code-body .tok-val{color:#FF6B35}
+.code-body .tok-sel{color:#1B9AAA}
+.code-body .tok-com{color:#555}
+.code-body .tok-prop{color:#A8C5C0}
+
+/* ===== 色板展示 ===== */
+.color-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0 24px}
+.color-card{border:2px solid #1B1B1B;box-shadow:4px 4px 0 #1B1B1B;border-radius:0;overflow:hidden}
+.color-swatch{height:80px;display:flex;align-items:flex-end;padding:8px 10px}
+.color-swatch .role{font-size:12px;font-weight:700;text-transform:uppercase}
+.color-info{padding:10px 12px;background:#fff;border-top:2px solid #1B1B1B}
+.color-info .name{font-size:13px;font-weight:700;color:#1B1B1B}
+.color-info .hex{font-size:12px;font-family:'Space Mono',monospace;color:#666;margin-top:2px}
+.color-info .var{font-size:11px;font-family:'Space Mono',monospace;color:#FF6B35;margin-top:4px;font-weight:700}
+
+/* ===== 规格表 ===== */
+.spec-table{width:100%;border-collapse:collapse;font-size:13px;border:2px solid #1B1B1B;margin:16px 0 24px}
+.spec-table th{background:#1B1B1B;color:#FFD23F;padding:10px 14px;text-align:left;font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:.5px}
+.spec-table td{padding:10px 14px;border-bottom:1px solid #DDD;color:#1B1B1B}
+.spec-table tr:nth-child(even) td{background:#FFD23F}
+.spec-table td:first-child{font-weight:700;width:160px}
+.spec-table .mono{font-family:'Space Mono',monospace;color:#004E89;font-weight:700}
+
+/* ===== 组件预览 ===== */
+.preview-card{border:2px solid #1B1B1B;box-shadow:6px 6px 0 #FF6B35;background:#fff;padding:20px;margin:16px 0 24px}
+.preview-card:nth-of-type(even){box-shadow:6px 6px 0 #004E89}
+.preview-title{font-size:14px;font-weight:700;color:#1B1B1B;text-transform:uppercase;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #1B1B1B}
+.preview-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.preview-row:last-child{margin-bottom:0}
+.preview-label{font-size:11px;font-family:'Space Mono',monospace;color:#9A9A9A;width:70px;text-transform:uppercase;font-weight:700}
+
+/* 孟菲斯组件样式 - 用于本文档内的预览 */
+.memphis-btn{font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;padding:8px 20px;border:2px solid #1B1B1B;border-radius:0;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:all .2s;display:inline-flex;align-items:center;gap:5px}
+.memphis-btn-primary{background:#FF6B35;color:#fff}
+.memphis-btn-primary:hover{background:#FFD23F;color:#1B1B1B}
+.memphis-btn-accent{background:#004E89;color:#fff}
+.memphis-btn-accent:hover{background:#1B9AAA}
+.memphis-btn-outline{background:#fff;color:#1B1B1B}
+.memphis-btn-outline:hover{background:#FFD23F}
+.memphis-btn-ghost{background:transparent;color:#4A4A4A;border:none}
+.memphis-badge{font-size:11px;padding:3px 10px;border:1.5px solid #1B1B1B;border-radius:0;font-weight:700;text-transform:uppercase}
+.memphis-badge-p{background:#FF6B35;color:#fff}
+.memphis-badge-a{background:#004E89;color:#fff}
+.memphis-badge-s{background:#FFD23F;color:#1B1B1B}
+.memphis-prog{display:flex;align-items:center;gap:10px;width:100%}
+.memphis-prog-track{flex:1;height:8px;background:#F5F5F0;border:1.5px solid #1B1B1B;border-radius:0;overflow:hidden}
+.memphis-prog-fill{height:100%;background:repeating-linear-gradient(45deg,#FF6B35,#FF6B35 6px,#FFD23F 6px,#FFD23F 12px)}
+.memphis-prog-text{font-family:'Space Mono',monospace;font-size:12px;color:#1B1B1B;font-weight:700;white-space:nowrap}
+.memphis-input{font-size:13px;padding:8px 12px;border:2px solid #1B1B1B;border-radius:0;background:#fff;color:#1B1B1B;outline:none;font-family:'Poppins',sans-serif}
+.memphis-input:focus{border-color:#FF6B35;box-shadow:4px 4px 0 #004E89}
+.memphis-select{font-size:13px;padding:8px 12px;border:2px solid #1B1B1B;border-radius:0;background:#fff;color:#1B1B1B;outline:none;font-family:'Poppins',sans-serif;cursor:pointer}
+.memphis-table{width:100%;border-collapse:collapse;font-size:12px;border:2px solid #1B1B1B;border-radius:0}
+.memphis-table th{background:#1B1B1B;color:#FFD23F;padding:9px 12px;font-weight:700;text-align:left;text-transform:uppercase;font-size:11px}
+.memphis-table td{padding:8px 12px;border-bottom:1px solid #DDD;color:#1B1B1B;background:#fff}
+.memphis-table tr:nth-child(even) td{background:#FFD23F}
+
+/* ===== 字体样例 ===== */
+.type-spec{padding:14px 0;border-bottom:1px solid #DDD}
+.type-spec:last-child{border-bottom:none}
+.type-spec .meta{font-size:11px;font-family:'Space Mono',monospace;color:#9A9A9A;text-transform:uppercase;margin-bottom:5px;font-weight:700}
+
+/* ===== 实施指南 ===== */
+.guide-step{border:2px solid #1B1B1B;box-shadow:4px 4px 0 #1B1B1B;background:#fff;padding:20px;margin-bottom:16px}
+.guide-step .step-num{font-size:28px;font-weight:800;color:#FF6B35;font-family:'Poppins',sans-serif;line-height:1}
+.guide-step .step-title{font-size:16px;font-weight:700;color:#1B1B1B;margin:8px 0 8px;text-transform:uppercase}
+.guide-step .step-desc{font-size:13px;color:#4A4A4A;line-height:1.7}
+.guide-step .step-desc code{background:#1B1B1B;color:#FFD23F;padding:2px 8px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700}
+
+/* ===== AI指令框 ===== */
+.ai-prompt{border:2px solid #1B1B1B;box-shadow:8px 8px 0 #FF6B35;background:#FFD23F;padding:24px;margin:20px 0}
+.ai-prompt .ai-label{font-size:12px;font-weight:700;color:#1B1B1B;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-family:'Space Mono',monospace}
+.ai-prompt .ai-content{font-size:14px;color:#1B1B1B;line-height:1.8;font-weight:500}
+.ai-prompt .ai-content code{background:#1B1B1B;color:#FFD23F;padding:2px 8px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700}
+
+/* ===== Footer ===== */
+.footer{padding:32px 0;background:#1B1B1B;text-align:center}
+.footer p{font-size:12px;color:#666;margin-bottom:4px;font-family:'Space Mono',monospace}
+.footer .ft-brand{color:#FFD23F;font-weight:700}
+</style>
+</head>
+<body>
+
+<!-- ===== 导航 ===== -->
+<nav class="top-nav">
+  <span class="brand">MEMPHIS UI</span>
+  <span class="sub">DESIGN SYSTEM v1.0</span>
+  <nav>
+    <a href="#tokens">01 令牌</a>
+    <a href="#color">02 色彩</a>
+    <a href="#type">03 字体</a>
+    <a href="#components">04 组件</a>
+    <a href="#stylesheet">05 样式表</a>
+    <a href="#guide">06 指南</a>
+  </nav>
+</nav>
+
+<!-- ===== Hero ===== -->
+<header class="hero">
+  <div class="hero-inner">
+    <h1>孟菲斯·撞色 UI标准文档</h1>
+    <p class="lead">80年代孟菲斯设计运动 + 波普艺术。粗黑描边、硬阴影偏移、撞色色块、纯直角。本文档为完整设计系统规范，包含设计令牌、组件规格与可复制样式表，可直接交由AI智能体实施系统样式改造。</p>
+    <div class="tags">
+      <span>BOLD BORDER</span>
+      <span>HARD SHADOW</span>
+      <span>CLASH COLOR</span>
+      <span>ZERO RADIUS</span>
+    </div>
+  </div>
+</header>
+
+<!-- ===== 01 设计令牌 ===== -->
+<section class="section" id="tokens">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-num">01 / DESIGN TOKENS</div>
+      <div class="sec-title">设计令牌</div>
+      <p class="sec-desc">所有视觉属性的原子级定义。AI智能体应将以下CSS变量注入项目根级 :root 或主题容器，后续所有组件样式引用这些令牌而非硬编码色值。变量名采用语义命名，便于跨项目复用。</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-head"><span class="lang">CSS :root variables</span><span class="copy">复制全部</span></div>
+      <div class="code-body"><pre>:root {
+  /* ===== 色彩令牌 ===== */
+  --memphis-primary:        #FF6B35;  /* 主色 - 活力橙 */
+  --memphis-primary-dark:   #E55A2B;  /* 主色暗调 - 悬停/按下 */
+  --memphis-accent:         #004E89;  /* 强调色 - 深蓝 */
+  --memphis-secondary:      #FFD23F;  /* 辅助色 - 明黄 */
+  --memphis-tertiary:       #1B9AAA;  /* 辅助色 - 青绿 */
+  --memphis-success:        #1B9AAA;  /* 成功状态 */
+  --memphis-warning:        #FFD23F;  /* 警告状态 */
+  --memphis-danger:         #E55A2B;  /* 危险状态 */
+
+  /* ===== 背景与表面 ===== */
+  --memphis-bg:             #FCFCFC;  /* 页面背景 */
+  --memphis-surface:        #FFFFFF;   /* 卡片/面板背景 */
+  --memphis-surface-alt:    #F5F5F0;   /* 次级背景/斑马纹 */
+  --memphis-surface-muted:  #F0F0EB;   /* 更深层背景 */
+
+  /* ===== 文字 ===== */
+  --memphis-text:           #1B1B1B;  /* 主文字色 */
+  --memphis-text-secondary: #4A4A4A;  /* 次要文字 */
+  --memphis-text-tertiary:  #9A9A9A;  /* 辅助文字/占位符 */
+  --memphis-text-inverse:   #FFFFFF;   /* 反色文字(深色背景上) */
+  --memphis-text-highlight: #FFD23F;  /* 高亮文字(黑底上) */
+
+  /* ===== 边框 ===== */
+  --memphis-border:         #1B1B1B;  /* 标准边框色 - 纯黑 */
+  --memphis-border-light:   #DDDDDD;  /* 表格内分隔线 */
+
+  /* ===== 字体 ===== */
+  --memphis-font-primary:   'Poppins', 'Noto Sans SC', sans-serif;
+  --memphis-font-mono:      'Space Mono', monospace;
+
+  /* ===== 尺寸 ===== */
+  --memphis-border-width:   2px;       /* 标准边框粗细 */
+  --memphis-border-thin:    1.5px;     /* 细边框(徽章等) */
+  --memphis-radius:         0px;       /* 圆角 - 永远为0 */
+  --memphis-shadow-offset:  6px;       /* 硬阴影偏移量 */
+  --memphis-shadow-offset-lg: 8px;     /* 大阴影偏移 */
+  --memphis-shadow-color:   #FF6B35;   /* 默认阴影色 */
+  --memphis-shadow-color-alt: #004E89; /* 交替阴影色 */
+
+  /* ===== 间距 ===== */
+  --memphis-space-xs:  4px;
+  --memphis-space-sm:  8px;
+  --memphis-space-md:  16px;
+  --memphis-space-lg:  24px;
+  --memphis-space-xl:  32px;
+  --memphis-space-2xl: 48px;
+}</pre>
+      </div>
+    </div>
+
+    <p style="font-size:13px;color:#4A4A4A;margin-top:8px">
+      <strong style="color:#FF6B35">实施要点：</strong>所有组件必须引用以上变量，禁止直接硬编码色值。圆角变量 <code style="background:#1B1B1B;color:#FFD23F;padding:2px 6px;font-family:'Space Mono',monospace;font-size:12px">--memphis-radius</code> 固定为 <code style="background:#1B1B1B;color:#FFD23F;padding:2px 6px;font-family:'Space Mono',monospace;font-size:12px">0px</code>，任何组件不得使用圆角。
+    </p>
+  </div>
+</section>
+
+<!-- ===== 02 色彩系统 ===== -->
+<section class="section" id="color">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-num">02 / COLOR SYSTEM</div>
+      <div class="sec-title">色彩系统</div>
+      <p class="sec-desc">孟菲斯风格的核心是大胆撞色。白底 + 粗黑边框 + 高饱和色块。每个颜色都有明确的语义角色和适用场景。</p>
+    </div>
+
+    <div class="color-grid">
+      <div class="color-card">
+        <div class="color-swatch" style="background:#FF6B35"><span class="role" style="color:#fff">PRIMARY</span></div>
+        <div class="color-info">
+          <div class="name">活力橙</div>
+          <div class="hex">#FF6B35</div>
+          <div class="var">--memphis-primary</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#004E89"><span class="role" style="color:#fff">ACCENT</span></div>
+        <div class="color-info">
+          <div class="name">深蓝</div>
+          <div class="hex">#004E89</div>
+          <div class="var">--memphis-accent</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#FFD23F"><span class="role" style="color:#1B1B1B">YELLOW</span></div>
+        <div class="color-info">
+          <div class="name">明黄</div>
+          <div class="hex">#FFD23F</div>
+          <div class="var">--memphis-secondary</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#1B9AAA"><span class="role" style="color:#fff">TEAL</span></div>
+        <div class="color-info">
+          <div class="name">青绿</div>
+          <div class="hex">#1B9AAA</div>
+          <div class="var">--memphis-tertiary</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#1B1B1B"><span class="role" style="color:#FFD23F">BLACK</span></div>
+        <div class="color-info">
+          <div class="name">纯黑</div>
+          <div class="hex">#1B1B1B</div>
+          <div class="var">--memphis-border / --memphis-text</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#FCFCFC;border-bottom:1px solid #1B1B1B"><span class="role" style="color:#1B1B1B">BG</span></div>
+        <div class="color-info">
+          <div class="name">近白</div>
+          <div class="hex">#FCFCFC</div>
+          <div class="var">--memphis-bg</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#F5F5F0"><span class="role" style="color:#1B1B1B">ALT</span></div>
+        <div class="color-info">
+          <div class="name">米灰</div>
+          <div class="hex">#F5F5F0</div>
+          <div class="var">--memphis-surface-alt</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#E55A2B"><span class="role" style="color:#fff">DARK</span></div>
+        <div class="color-info">
+          <div class="name">主色暗</div>
+          <div class="hex">#E55A2B</div>
+          <div class="var">--memphis-primary-dark</div>
+        </div>
+      </div>
+    </div>
+
+    <table class="spec-table">
+      <thead>
+        <tr><th>色彩角色</th><th>色值</th><th>适用场景</th><th>文字色</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>主色 Primary</td><td class="mono">#FF6B35</td><td>主按钮背景、链接、图标、进度条条纹</td><td>白色 #FFFFFF</td></tr>
+        <tr><td>强调色 Accent</td><td class="mono">#004E89</td><td>强调按钮、表头背景、阴影色交替</td><td>白色 #FFFFFF</td></tr>
+        <tr><td>辅助黄 Secondary</td><td class="mono">#FFD23F</td><td>悬停态、斑马纹、徽章背景、高亮文字</td><td>黑色 #1B1B1B</td></tr>
+        <tr><td>辅助青 Tertiary</td><td class="mono">#1B9AAA</td><td>信息徽章、链接悬停态、成功状态</td><td>白色 #FFFFFF</td></tr>
+        <tr><td>纯黑 Border</td><td class="mono">#1B1B1B</td><td>所有边框、表头文字、主标题</td><td>-</td></tr>
+        <tr><td>近白 Background</td><td class="mono">#FCFCFC</td><td>页面背景、输入框背景</td><td>-</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 03 字体系统 ===== -->
+<section class="section" id="type">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-num">03 / TYPOGRAPHY</div>
+      <div class="sec-title">字体系统</div>
+      <p class="sec-desc">孟菲斯风格使用 Poppins（圆润几何无衬线）作为主字体，Space Mono（等宽打字机字体）用于代码/数字/标签。所有标题采用大写字母 (text-transform: uppercase) + 粗体。</p>
+    </div>
+
+    <table class="spec-table">
+      <thead>
+        <tr><th>层级</th><th>字体</th><th>字号</th><th>字重</th><th>行高</th><th>大写</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>页面标题 H1</td><td class="mono">Poppins</td><td class="mono">32px</td><td class="mono">800</td><td class="mono">1.3</td><td class="mono">uppercase</td></tr>
+        <tr><td>区块标题 H2</td><td class="mono">Poppins</td><td class="mono">24px</td><td class="mono">800</td><td class="mono">1.3</td><td class="mono">uppercase</td></tr>
+        <tr><td>卡片标题 H3</td><td class="mono">Poppins</td><td class="mono">18px</td><td class="mono">700</td><td class="mono">1.4</td><td class="mono">none</td></tr>
+        <tr><td>正文 Body</td><td class="mono">Poppins</td><td class="mono">14px</td><td class="mono">400</td><td class="mono">1.6</td><td class="mono">none</td></tr>
+        <tr><td>小字 Small</td><td class="mono">Poppins</td><td class="mono">12px</td><td class="mono">500</td><td class="mono">1.5</td><td class="mono">none</td></tr>
+        <tr><td>标签/代码 Mono</td><td class="mono">Space Mono</td><td class="mono">11-13px</td><td class="mono">700</td><td class="mono">1.5</td><td class="mono">uppercase</td></tr>
+      </tbody>
+    </table>
+
+    <div class="preview-card">
+      <div class="preview-title">字体样例</div>
+      <div class="type-spec">
+        <div class="meta">H1 / 32px / POPPINS 800 / UPPERCASE</div>
+        <div style="font-size:32px;font-weight:800;font-family:'Poppins',sans-serif;text-transform:uppercase;color:#1B1B1B">课程体系目录</div>
+      </div>
+      <div class="type-spec">
+        <div class="meta">H2 / 24px / POPPINS 800 / UPPERCASE</div>
+        <div style="font-size:24px;font-weight:800;font-family:'Poppins',sans-serif;text-transform:uppercase;color:#1B1B1B">班级与进度管理</div>
+      </div>
+      <div class="type-spec">
+        <div class="meta">BODY / 14px / POPPINS 400</div>
+        <div style="font-size:14px;font-weight:400;font-family:'Poppins',sans-serif;color:#4A4A4A">按学段 → 年龄 → 体系层级浏览课程目录，展开查看课次详情与下期衔接关系。</div>
+      </div>
+      <div class="type-spec">
+        <div class="meta">MONO / 13px / SPACE MONO 700 / UPPERCASE</div>
+        <div style="font-size:13px;font-weight:700;font-family:'Space Mono',monospace;text-transform:uppercase;color:#FF6B35">course_progress / 2026-08 / class-A</div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-head"><span class="lang">CSS Typography</span><span class="copy">复制</span></div>
+      <div class="code-body"><pre>body {
+  font-family: var(--memphis-font-primary);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--memphis-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, .section-title {
+  font-family: var(--memphis-font-primary);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.3px;
+  color: var(--memphis-text);
+}
+
+h1 { font-size: 32px; line-height: 1.3; }
+h2 { font-size: 24px; line-height: 1.3; }
+h3 { font-size: 18px; font-weight: 700; line-height: 1.4; }
+
+code, .mono, .label-text {
+  font-family: var(--memphis-font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 黑底高亮文字 */
+.text-highlight {
+  color: var(--memphis-text-highlight);
+  background: var(--memphis-text);
+  padding: 2px 8px;
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 04 组件规范 ===== -->
+<section class="section" id="components">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-num">04 / COMPONENTS</div>
+      <div class="sec-title">组件规范</div>
+      <p class="sec-desc">每个组件包含视觉预览 + 完整CSS代码。所有组件遵循：纯直角(border-radius:0)、2px黑色描边、硬阴影偏移、大写粗体文字。</p>
+    </div>
+
+    <!-- 按钮 -->
+    <h3 style="font-size:18px;font-weight:700;text-transform:uppercase;margin:24px 0 12px;padding-bottom:8px;border-bottom:2px solid #1B1B1B">4.1 按钮 Button</h3>
+    <div class="preview-card">
+      <div class="preview-title">按钮预览</div>
+      <div class="preview-row"><span class="preview-label">主按钮</span><button class="memphis-btn memphis-btn-primary">生成进度</button></div>
+      <div class="preview-row"><span class="preview-label">强调</span><button class="memphis-btn memphis-btn-accent">导出Excel</button></div>
+      <div class="preview-row"><span class="preview-label">描边</span><button class="memphis-btn memphis-btn-outline">预览</button></div>
+      <div class="preview-row"><span class="preview-label">幽灵</span><button class="memphis-btn memphis-btn-ghost">取消</button></div>
+      <div class="preview-row"><span class="preview-label">小按钮</span><button class="memphis-btn memphis-btn-primary" style="padding:5px 14px;font-size:12px">查看课次</button><button class="memphis-btn memphis-btn-outline" style="padding:5px 14px;font-size:12px">编辑</button></div>
+    </div>
+    <div class="code-block">
+      <div class="code-head"><span class="lang">CSS Button</span><span class="copy">复制</span></div>
+      <div class="code-body"><pre>/* 基础按钮 */
+.btn {
+  font-family: var(--memphis-font-primary);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 20px;
+  border: 2px solid var(--memphis-border);
+  border-radius: 0;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-sm { padding: 5px 14px; font-size: 12px; }
+.btn-lg { padding: 12px 28px; font-size: 15px; }
+
+/* 主按钮 - 活力橙 */
+.btn-primary {
+  background: var(--memphis-primary);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--memphis-secondary);
+  color: var(--memphis-text);
+}
+
+/* 强调按钮 - 深蓝 */
+.btn-accent {
+  background: var(--memphis-accent);
+  color: #fff;
+}
+.btn-accent:hover {
+  background: var(--memphis-tertiary);
+}
+
+/* 描边按钮 */
+.btn-outline {
+  background: #fff;
+  color: var(--memphis-text);
+}
+.btn-outline:hover {
+  background: var(--memphis-secondary);
+}
+
+/* 幽灵按钮 - 无边框 */
+.btn-ghost {
+  background: transparent;
+  color: var(--memphis-text-secondary);
+  border: none;
+}
+.btn-ghost:hover {
+  color: var(--memphis-primary);
+  text-decoration: underline;
+}
+
+/* 危险按钮 */
+.btn-danger {
+  background: var(--memphis-danger);
+  color: #fff;
+}
+.btn-danger:hover {
+  background: var(--memphis-text);
+}</pre>
+      </div>
+    </div>
+
+    <!-- 徽章 -->
+    <h3 style="font-size:18px;font-weight:700;text-transform:uppercase;margin:24px 0 12px;padding-bottom:8px;border-bottom:2px solid #1B1B1B">4.2 徽章 Badge</h3>
+    <div class="preview-card">
+      <div class="preview-title">徽章预览</div>
+      <div class="preview-row"><span class="preview-label">主色</span><span class="memphis-badge memphis-badge-p">进行中</span></div>
+      <div class="preview-row"><span class="preview-label">强调</span><span class="memphis-badge memphis-badge-a">已衔接</span></div>
+      <div class="preview-row"><span class="preview-label">辅助</span><span class="memphis-badge memphis-badge-s">已完成</span></div>
+      <div class="preview-row"><span class="preview-label">描边</span><span class="memphis-badge" style="background:#fff;color:#1B1B1B">待处理</span></div>
+    </div>
+    <div class="code-block">
+      <div class="code-head"><span class="lang">CSS Badge</span><span class="copy">复制</span></div>
+      <div class="code-body"><pre>/* 基础徽章 */
+.badge {
+  font-size: 11px;
+  padding: 3px 10px;
+  border: 1.5px solid var(--memphis-border);
+  border-radius: 0;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+/* 主色徽章 - 橙底白字 */
+.badge-primary {
+  background: var(--memphis-primary);
+  color: #fff;
+}
+
+/* 强调徽章 - 蓝底白字 */
+.badge-accent {
+  background: var(--memphis-accent);
+  color: #fff;
+}
+
+/* 辅助徽章 - 黄底黑字 */
+.badge-secondary {
+  background: var(--memphis-secondary);
+  color: var(--memphis-text);
+}
+
+/* 描边徽章 - 白底黑字黑边 */
+.badge-outline {
+  background: #fff;
+  color: var(--memphis-text);
+}
+
+/* 青绿徽章 - 信息提示 */
+.badge-info {
+  background: var(--memphis-tertiary);
+  color: #fff;
+}</pre>
+      </div>
+    </div>
+
+    <!-- 进度条 -->
+    <h3 style="font-size:18px;font-weight:700;text-transform:uppercase;margin:24px 0 12px;padding-bottom:8px;border-bottom:2px solid #1B1B1B">4.3 进度条 Progress</h3>
+    <div class="preview-card">
+      <div class="preview-title">进度条预览</div>
+      <div class="preview-row"><span class="preview-label">课次进度</span><div class="memphis-prog"><div class="memphis-prog-track"><div class="memphis-prog-fill" style="width:50%"></div></div><span class="memphis-prog-text">6/12</span></div></div>
+      <div class="preview-row"><span class="preview-label">完成度</span><div class="memphis-prog"><div class="memphis-prog-track"><div class="memphis-prog-fill" style="width:100%"></div></div><span class="memphis-prog-text">12/12</span></div></div>
+    </div>
+    <div class="code-block">
+      <div class="code-head"><span class="lang">CSS Progress</span><span class="copy">复制</span></div>
+      <div class="code-body"><pre>/* 进度条容器 */
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+/* 轨道 - 米灰底+黑色描边 */
+.progress-track {
+  flex: 1;
+  height: 8px;
+  background: var(--memphis-surface-alt);
+  border: 1.5px solid var(--memphis-border);
+  border-radius: 0;
+  overflow: hidden;
+}
+
+/* 填充 - 45度斜纹(橙黄交替) */
+.progress-fill {
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--memphis-primary),
+    var(--memphis-primary) 6px,
+    var(--memphis-secondary) 6px,
+    var(--memphis-secondary) 12px
+  );
+}
+
+/* 进度数字 - 等宽字体 */
+.progress-text {
+  font-family: var(--memphis-font-mono);
+  font-size: 12px;
+  color: var(--memphis-text);
+  font-weight: 700;
+  white-space: nowrap;
+}</pre>
+      </div>
+    </div>
+
+    <!-- 输入框 -->
+    <h3 style="font-size:18px;font-weight:700;text-transform:uppercase;margin:24px 0 12px;padding-bottom:8px;border-bottom:2px solid #1B1B1B">4.4 输入框 Input / Select</h3>
+    <div class="preview-card">
+      <div class="preview-title">输入框预览</div>
+      <div class="preview-row"><span class="preview-label">输入</span><input class="memphis-input" placeholder="搜索体系名称..." style="width:200px"></div>
+      <div class="preview-row"><span class="preview-label">下拉</span><select class="memphis-select"><option>全部学段</option><option>学前</option><option>学龄</option></select></div>
+    </div>
+    <div class="code-block">
+      <div class="code-head"><span class="lang">CSS Input</span><span class="copy">复制</span></div>
+      <div class="code-body"><pre>/* 文本输入框 */
+.input, .select, textarea, input[type="text"], input[type="search"],
+input[type="email"], input[type="password"] {
+  font-size: 13px;
+  padding: 8px 12px;
+  border: 2px solid var(--memphis-border);
+  border-radius: 0;
+  background: #fff;
+  color: var(--memphis-text);
+  outline: none;
+  font-family: var(--memphis-font-primary);
+  transition: all 0.2s;
+}
+
+/* 聚焦态 - 橙色边框 + 蓝色硬阴影 */
+.input:focus, .select:focus, textarea:focus,
+input:focus, select:focus {
+  border-color: var(--memphis-primary);
+  box-shadow: 4px 4px 0 var(--memphis-accent);
+}
+
+/* 下拉框 */
+.select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%231B1B1B' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+}
+
+/* 占位符 */
+.input::placeholder, input::placeholder {
+  color: var(--memphis-text-tertiary);
+  font-weight: 400;
+}
+
+/* 表单标签 */
+.form-label {
+  font-size: 11px;
+  font-family: var(--memphis-font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--memphis-text-tertiary);
+  display: block;
+  margin-bottom: 6px;
+}</pre>
+      </div>
+    </div>
+
+    <!-- 表格 -->
+    <h3 style="font-size:18px;font-weight:700;text-transform:uppercase;margin:24px 0 12px;padding-bottom:8px;border-bottom:2px solid #1B1B1B">4.5 表格 Table</h3>
+    <div class="preview-card">
+      <div class="preview-title">表格预览</div>
+      <table class="memphis-table">
+        <thead>
+          <tr><th>体系</th><th>课次</th><th>进度</th><th>下期衔接</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>机械构造一</td><td>第6课</td><td><span class="memphis-badge memphis-badge-p">50%</span></td><td>初级机器人</td></tr>
+          <tr><td>初级机器人</td><td>第3课</td><td><span class="memphis-badge memphis-badge-a">25%</span></td><td>结构学</td></tr>
+          <tr><td>百变梦工厂</td><td>第12课</td><td><span class="memphis-badge memphis-badge-s">完结</span></td><td>城市之旅</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="code-block">
+      <div class="code-head"><span class="lang">CSS Table</span><span class="copy">复制</span></div>
+      <div class="code-body"><pre>/* 表格 */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  border: 2px solid var(--memphis-border);
+  border-radius: 0;
+}
+
+/* 表头 - 黑底黄字 */
+.table th {
+  background: var(--memphis-text);
+  color: var(--memphis-secondary);
+  padding: 9px 12px;
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+  font-size: 11px;
+  border: none;
+}
+
+/* 表格单元格 */
+.table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--memphis-border-light);
+  color: var(--memphis-text);
+  background: #fff;
+}
+
+/* 斑马纹 - 黄底黑字(偶数行) */
+.table tr:nth-child(even) td {
+  background: var(--memphis-secondary);
+}
+
+/* 悬停行 - 橙底白字 */
+.table tbody tr:hover td {
+  background: var(--memphis-primary);
+  color: #fff;
+}</pre>
+      </div>
+    </div>
+
+    <!-- 卡片 -->
+    <h3 style="font-size:18px;font-weight:700;text-transform:uppercase;margin:24px 0 12px;padding-bottom:8px;border-bottom:2px solid #1B1B1B">4.6 卡片 Card</h3>
+    <div class="preview-card">
+      <div class="preview-title">卡片预览</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px">
+        <div style="border:2px solid #1B1B1B;box-shadow:6px 6px 0 #FF6B35;background:#fff;padding:16px">
+          <div style="font-weight:700;font-size:13px;margin-bottom:8px;text-transform:uppercase">橙色阴影卡片</div>
+          <div style="font-size:12px;color:#4A4A4A">默认阴影色为主色橙 #FF6B35</div>
+        </div>
+        <div style="border:2px solid #1B1B1B;box-shadow:6px 6px 0 #004E89;background:#fff;padding:16px">
+          <div style="font-weight:700;font-size:13px;margin-bottom:8px;text-transform:uppercase">蓝色阴影卡片</div>
+          <div style="font-size:12px;color:#4A4A4A">交替阴影色为强调蓝 #004E89</div>
+        </div>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-head"><span class="lang">CSS Card</span><span class="copy">复制</span></div>
+      <div class="code-body"><pre>/* 基础卡片 - 2px黑边 + 硬阴影 */
+.card {
+  background: #fff;
+  border: 2px solid var(--memphis-border);
+  box-shadow: var(--memphis-shadow-offset) var(--memphis-shadow-offset) 0 var(--memphis-shadow-color);
+  padding: 20px;
+  border-radius: 0;
+  transition: all 0.2s;
+}
+
+/* 卡片悬停 - 阴影消除 */
+.card:hover {
+  transform: translate(3px, 3px);
+  box-shadow: calc(var(--memphis-shadow-offset) - 3px) calc(var(--memphis-shadow-offset) - 3px) 0 var(--memphis-shadow-color);
+}
+
+/* 交替阴影色(蓝色) - 用于偶数卡片 */
+.card-alt {
+  box-shadow: var(--memphis-shadow-offset) var(--memphis-shadow-offset) 0 var(--memphis-shadow-color-alt);
+}
+
+/* 卡片标题 */
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--memphis-text);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--memphis-border);
+}
+
+/* 卡片描述 */
+.card-desc {
+  font-size: 12px;
+  color: var(--memphis-text-secondary);
+  line-height: 1.6;
+}</pre>
+      </div>
+    </div>
+
+    <!-- 导航 -->
+    <h3 style="font-size:18px;font-weight:700;text-transform:uppercase;margin:24px 0 12px;padding-bottom:8px;border-bottom:2px solid #1B1B1B">4.7 导航 Navigation</h3>
+    <div class="code-block">
+      <div class="code-head"><span class="lang">CSS Navigation</span><span class="copy">复制</span></div>
+      <div class="code-body"><pre>/* 顶部导航栏 */
+.navbar {
+  height: 52px;
+  background: var(--memphis-text);
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* 品牌名 - 黄色大写粗体 */
+.navbar .brand {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--memphis-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 导航链接 */
+.navbar nav a {
+  color: #888;
+  text-decoration: none;
+  font-size: 12px;
+  padding: 6px 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+}
+
+.navbar nav a:hover {
+  color: var(--memphis-secondary);
+  background: #2A2A2A;
+}
+
+.navbar nav a.active {
+  color: var(--memphis-secondary);
+  border-bottom: 2px solid var(--memphis-primary);
+}
+
+/* 侧边栏 */
+.sidebar {
+  background: #fff;
+  border-right: 2px solid var(--memphis-border);
+  padding: 16px 0;
+  min-height: 100vh;
+}
+
+.sidebar-item {
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+  transition: all 0.2s;
+}
+
+.sidebar-item:hover {
+  background: var(--memphis-surface-alt);
+  border-left-color: var(--memphis-secondary);
+}
+
+.sidebar-item.active {
+  background: var(--memphis-secondary);
+  border-left-color: var(--memphis-primary);
+  color: var(--memphis-text);
+  font-weight: 700;
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 05 完整样式表 ===== -->
+<section class="section" id="stylesheet">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-num">05 / GLOBAL STYLESHEET</div>
+      <div class="sec-title">全局样式表</div>
+      <p class="sec-desc">以下为可直接复制粘贴的完整CSS样式表。AI智能体可将此代码注入项目全局CSS文件，或作为独立主题样式表加载。包含全部设计令牌 + 全部组件样式。</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-head"><span class="lang">CSS Complete Stylesheet - 复制全部</span><span class="copy">复制全部</span></div>
+      <div class="code-body"><pre>/* ================================================================
+   孟菲斯·撞色 MEMPHIS POP — 全局UI样式表 v1.0
+   课程进度自动生成系统
+   ================================================================
+   使用方式：
+   1. 将本段CSS注入项目全局样式文件(如 styles.css / global.css)
+   2. 在HTML  中加载 Poppins + Space Mono 字体
+   3. 所有组件自动应用孟菲斯风格
+   字体引入：
+   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;family=Space+Mono:wght@400;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+   ================================================================ */
+
+/* ===== 设计令牌 ===== */
+:root {
+  --memphis-primary: #FF6B35;
+  --memphis-primary-dark: #E55A2B;
+  --memphis-accent: #004E89;
+  --memphis-secondary: #FFD23F;
+  --memphis-tertiary: #1B9AAA;
+  --memphis-success: #1B9AAA;
+  --memphis-warning: #FFD23F;
+  --memphis-danger: #E55A2B;
+  --memphis-bg: #FCFCFC;
+  --memphis-surface: #FFFFFF;
+  --memphis-surface-alt: #F5F5F0;
+  --memphis-surface-muted: #F0F0EB;
+  --memphis-text: #1B1B1B;
+  --memphis-text-secondary: #4A4A4A;
+  --memphis-text-tertiary: #9A9A9A;
+  --memphis-text-inverse: #FFFFFF;
+  --memphis-text-highlight: #FFD23F;
+  --memphis-border: #1B1B1B;
+  --memphis-border-light: #DDDDDD;
+  --memphis-font-primary: 'Poppins', 'Noto Sans SC', sans-serif;
+  --memphis-font-mono: 'Space Mono', monospace;
+  --memphis-border-width: 2px;
+  --memphis-border-thin: 1.5px;
+  --memphis-radius: 0px;
+  --memphis-shadow-offset: 6px;
+  --memphis-shadow-offset-lg: 8px;
+  --memphis-shadow-color: #FF6B35;
+  --memphis-shadow-color-alt: #004E89;
+  --memphis-space-xs: 4px;
+  --memphis-space-sm: 8px;
+  --memphis-space-md: 16px;
+  --memphis-space-lg: 24px;
+  --memphis-space-xl: 32px;
+  --memphis-space-2xl: 48px;
+}
+
+/* ===== 全局重置 ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--memphis-font-primary);
+  font-size: 14px;
+  line-height: 1.6;
+  background: var(--memphis-bg);
+  color: var(--memphis-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== 字体层级 ===== */
+h1 { font-size: 32px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.3px; line-height: 1.3; }
+h2 { font-size: 24px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.3px; line-height: 1.3; }
+h3 { font-size: 18px; font-weight: 700; line-height: 1.4; }
+h4 { font-size: 16px; font-weight: 700; line-height: 1.4; }
+p { font-size: 14px; line-height: 1.6; color: var(--memphis-text-secondary); }
+
+code, .mono {
+  font-family: var(--memphis-font-mono);
+  font-weight: 700;
+}
+
+/* ===== 按钮 ===== */
+.btn {
+  font-family: var(--memphis-font-primary);
+  font-size: 13px; font-weight: 700;
+  padding: 8px 20px;
+  border: var(--memphis-border-width) solid var(--memphis-border);
+  border-radius: 0; cursor: pointer;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px;
+}
+.btn-sm { padding: 5px 14px; font-size: 12px; }
+.btn-lg { padding: 12px 28px; font-size: 15px; }
+.btn-primary { background: var(--memphis-primary); color: #fff; }
+.btn-primary:hover { background: var(--memphis-secondary); color: var(--memphis-text); }
+.btn-accent { background: var(--memphis-accent); color: #fff; }
+.btn-accent:hover { background: var(--memphis-tertiary); }
+.btn-outline { background: #fff; color: var(--memphis-text); }
+.btn-outline:hover { background: var(--memphis-secondary); }
+.btn-ghost { background: transparent; color: var(--memphis-text-secondary); border: none; }
+.btn-ghost:hover { color: var(--memphis-primary); text-decoration: underline; }
+.btn-danger { background: var(--memphis-danger); color: #fff; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ===== 徽章 ===== */
+.badge {
+  font-size: 11px; padding: 3px 10px;
+  border: var(--memphis-border-thin) solid var(--memphis-border);
+  border-radius: 0; font-weight: 700;
+  text-transform: uppercase; display: inline-block;
+}
+.badge-primary { background: var(--memphis-primary); color: #fff; }
+.badge-accent { background: var(--memphis-accent); color: #fff; }
+.badge-secondary { background: var(--memphis-secondary); color: var(--memphis-text); }
+.badge-outline { background: #fff; color: var(--memphis-text); }
+.badge-info { background: var(--memphis-tertiary); color: #fff; }
+
+/* ===== 进度条 ===== */
+.progress { display: flex; align-items: center; gap: 10px; width: 100%; }
+.progress-track {
+  flex: 1; height: 8px;
+  background: var(--memphis-surface-alt);
+  border: var(--memphis-border-thin) solid var(--memphis-border);
+  border-radius: 0; overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: repeating-linear-gradient(45deg, var(--memphis-primary), var(--memphis-primary) 6px, var(--memphis-secondary) 6px, var(--memphis-secondary) 12px);
+}
+.progress-text {
+  font-family: var(--memphis-font-mono);
+  font-size: 12px; color: var(--memphis-text); font-weight: 700; white-space: nowrap;
+}
+
+/* ===== 输入框 ===== */
+.input, .select, textarea, input[type="text"], input[type="search"], input[type="email"], input[type="password"], input[type="number"] {
+  font-size: 13px; padding: 8px 12px;
+  border: var(--memphis-border-width) solid var(--memphis-border);
+  border-radius: 0; background: #fff; color: var(--memphis-text);
+  outline: none; font-family: var(--memphis-font-primary); transition: all 0.2s;
+}
+.input:focus, .select:focus, textarea:focus, input:focus, select:focus {
+  border-color: var(--memphis-primary);
+  box-shadow: 4px 4px 0 var(--memphis-accent);
+}
+.input::placeholder, input::placeholder {
+  color: var(--memphis-text-tertiary); font-weight: 400;
+}
+.select {
+  cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%231B1B1B' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px;
+}
+.form-label {
+  font-size: 11px; font-family: var(--memphis-font-mono);
+  font-weight: 700; text-transform: uppercase;
+  color: var(--memphis-text-tertiary); display: block; margin-bottom: 6px;
+}
+
+/* ===== 表格 ===== */
+.table {
+  width: 100%; border-collapse: collapse; font-size: 12px;
+  border: var(--memphis-border-width) solid var(--memphis-border); border-radius: 0;
+}
+.table th {
+  background: var(--memphis-text); color: var(--memphis-secondary);
+  padding: 9px 12px; font-weight: 700; text-align: left;
+  text-transform: uppercase; font-size: 11px; border: none;
+}
+.table td {
+  padding: 8px 12px; border-bottom: 1px solid var(--memphis-border-light);
+  color: var(--memphis-text); background: #fff;
+}
+.table tr:nth-child(even) td { background: var(--memphis-secondary); }
+.table tbody tr:hover td { background: var(--memphis-primary); color: #fff; }
+
+/* ===== 卡片 ===== */
+.card {
+  background: #fff; border: var(--memphis-border-width) solid var(--memphis-border);
+  box-shadow: var(--memphis-shadow-offset) var(--memphis-shadow-offset) 0 var(--memphis-shadow-color);
+  padding: 20px; border-radius: 0; transition: all 0.2s;
+}
+.card:hover {
+  transform: translate(3px, 3px);
+  box-shadow: calc(var(--memphis-shadow-offset) - 3px) calc(var(--memphis-shadow-offset) - 3px) 0 var(--memphis-shadow-color);
+}
+.card-alt {
+  box-shadow: var(--memphis-shadow-offset) var(--memphis-shadow-offset) 0 var(--memphis-shadow-color-alt);
+}
+.card-title {
+  font-size: 13px; font-weight: 700; color: var(--memphis-text);
+  text-transform: uppercase; margin-bottom: 12px;
+  padding-bottom: 10px; border-bottom: var(--memphis-border-width) solid var(--memphis-border);
+}
+
+/* ===== 导航 ===== */
+.navbar {
+  height: 52px; background: var(--memphis-text);
+  display: flex; align-items: center; padding: 0 32px;
+  position: sticky; top: 0; z-index: 1000;
+}
+.navbar .brand {
+  font-size: 16px; font-weight: 800; color: var(--memphis-secondary);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.navbar nav a {
+  color: #888; text-decoration: none; font-size: 12px;
+  padding: 6px 14px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s;
+}
+.navbar nav a:hover { color: var(--memphis-secondary); background: #2A2A2A; }
+.navbar nav a.active { color: var(--memphis-secondary); border-bottom: 2px solid var(--memphis-primary); }
+
+.sidebar {
+  background: #fff; border-right: var(--memphis-border-width) solid var(--memphis-border);
+  padding: 16px 0; min-height: 100vh;
+}
+.sidebar-item {
+  padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+  border-left: 4px solid transparent; transition: all 0.2s;
+}
+.sidebar-item:hover { background: var(--memphis-surface-alt); border-left-color: var(--memphis-secondary); }
+.sidebar-item.active {
+  background: var(--memphis-secondary); border-left-color: var(--memphis-primary);
+  color: var(--memphis-text); font-weight: 700;
+}
+
+/* ===== 标签页 ===== */
+.tabs { display: flex; border-bottom: var(--memphis-border-width) solid var(--memphis-border); }
+.tab {
+  padding: 8px 20px; font-size: 13px; font-weight: 700;
+  text-transform: uppercase; cursor: pointer;
+  border: var(--memphis-border-width) solid transparent;
+  border-bottom: none; transition: all 0.2s;
+}
+.tab:hover { background: var(--memphis-surface-alt); }
+.tab.active {
+  border-color: var(--memphis-border);
+  background: var(--memphis-secondary);
+  position: relative; top: 2px;
+}
+
+/* ===== 对话框 ===== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(27,27,27,.5);
+  display: flex; align-items: center; justify-content: center; z-index: 2000;
+}
+.modal {
+  background: #fff; border: var(--memphis-border-width) solid var(--memphis-border);
+  box-shadow: var(--memphis-shadow-offset-lg) var(--memphis-shadow-offset-lg) 0 var(--memphis-shadow-color);
+  padding: 24px; min-width: 400px; border-radius: 0;
+}
+.modal-header {
+  font-size: 18px; font-weight: 700; text-transform: uppercase;
+  margin-bottom: 16px; padding-bottom: 12px;
+  border-bottom: var(--memphis-border-width) solid var(--memphis-border);
+}
+.modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; }
+
+/* ===== 标签/Chip ===== */
+.chip {
+  font-size: 11px; padding: 4px 12px;
+  border: var(--memphis-border-width) solid var(--memphis-border);
+  border-radius: 0; font-weight: 700;
+  text-transform: uppercase; background: var(--memphis-text); color: var(--memphis-secondary);
+  display: inline-flex; align-items: center; gap: 4px;
+}
+
+/* ===== 分隔线 ===== */
+.divider {
+  height: var(--memphis-border-width); background: var(--memphis-border); border: none; margin: 16px 0;
+}
+
+/* ===== 空状态 ===== */
+.empty-state {
+  text-align: center; padding: 48px 20px;
+  border: var(--memphis-border-width) dashed var(--memphis-border);
+  background: var(--memphis-surface-alt); border-radius: 0;
+}
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state .title { font-size: 16px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
+.empty-state .desc { font-size: 13px; color: var(--memphis-text-tertiary); }
+
+/* ===== 加载态 ===== */
+.loading {
+  display: inline-block; width: 20px; height: 20px;
+  border: 3px solid var(--memphis-border); border-top-color: var(--memphis-primary);
+  animation: memphis-spin 0.8s linear infinite; border-radius: 0;
+}
+@keyframes memphis-spin { to { transform: rotate(360deg); } }
+
+/* ===== 工具类 ===== */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-primary { color: var(--memphis-primary); }
+.text-accent { color: var(--memphis-accent); }
+.text-secondary { color: var(--memphis-secondary); }
+.text-muted { color: var(--memphis-text-tertiary); }
+.bg-primary { background: var(--memphis-primary); }
+.bg-accent { background: var(--memphis-accent); }
+.bg-secondary { background: var(--memphis-secondary); }
+.bg-dark { background: var(--memphis-text); color: var(--memphis-text-inverse); }
+.border-bold { border: var(--memphis-border-width) solid var(--memphis-border); }
+.shadow-hard { box-shadow: var(--memphis-shadow-offset) var(--memphis-shadow-offset) 0 var(--memphis-shadow-color); }
+.no-radius { border-radius: 0 !important; }
+.uppercase { text-transform: uppercase; }
+.font-mono { font-family: var(--memphis-font-mono); }</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 06 实施指南 ===== -->
+<section class="section" id="guide">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-num">06 / IMPLEMENTATION GUIDE</div>
+      <div class="sec-title">实施指南</div>
+      <p class="sec-desc">以下步骤指导AI智能体如何将孟菲斯风格应用到现有系统中。</p>
+    </div>
+
+    <div class="guide-step">
+      <div class="step-num">01</div>
+      <div class="step-title">引入字体</div>
+      <div class="step-desc">在HTML <code>&lt;head&gt;</code> 中添加 Poppins + Space Mono + Noto Sans SC 字体引用。这是孟菲斯风格的基础字体，缺少将导致视觉风格偏差。</div>
+    </div>
+
+    <div class="guide-step">
+      <div class="step-num">02</div>
+      <div class="step-title">注入设计令牌</div>
+      <div class="step-desc">将 <code>:root</code> 中的CSS变量注入全局样式文件。如果项目已有变量系统，将 <code>--memphis-*</code> 前缀的变量映射到项目现有变量，或直接追加到 <code>:root</code>。</div>
+    </div>
+
+    <div class="guide-step">
+      <div class="step-num">03</div>
+      <div class="step-title">替换组件样式</div>
+      <div class="step-desc">将第05节的全局样式表注入项目CSS。根据项目使用的CSS框架做适配：<br><br>
+      <strong>纯CSS项目：</strong>直接将样式表追加到全局CSS文件<br>
+      <strong>Tailwind项目：</strong>在 <code>tailwind.config.js</code> 的 <code>theme.extend</code> 中映射颜色和圆角，或在全局CSS中用 <code>@layer</code> 覆盖<br>
+      <strong>Vue/React组件库：</strong>将样式表作为全局样式引入，组件中使用语义类名</div>
+    </div>
+
+    <div class="guide-step">
+      <div class="step-num">04</div>
+      <div class="step-title">关键覆盖规则</div>
+      <div class="step-desc">以下规则必须严格执行，否则风格将失真：<br><br>
+      1. 所有 <code>border-radius</code> 必须为 <code>0</code>，包括按钮、输入框、卡片、图片<br>
+      2. 所有边框粗细统一为 <code>2px</code>（徽章等小元素 <code>1.5px</code>）<br>
+      3. 阴影使用硬偏移格式 <code>Xpx Ypx 0 color</code>，禁止使用模糊阴影 <code>box-shadow: 0 4px 12px rgba(...)</code><br>
+      4. 按钮和徽章文字必须 <code>text-transform: uppercase</code><br>
+      5. 颜色必须使用定义的令牌变量，禁止使用未在色板中定义的色值<br>
+      6. 禁止使用渐变（进度条斜纹除外），所有背景为纯色</div>
+    </div>
+
+    <div class="guide-step">
+      <div class="step-num">05</div>
+      <div class="step-title">验证检查清单</div>
+      <div class="step-desc">实施完成后逐项检查：<br><br>
+      <code>[ ]</code> 所有圆角是否为0？<br>
+      <code>[ ]</code> 所有边框是否为2px黑色？<br>
+      <code>[ ]</code> 卡片是否有硬阴影偏移？<br>
+      <code>[ ]</code> 按钮文字是否大写？<br>
+      <code>[ ]</code> 表格斑马纹是否为黄色？<br>
+      <code>[ ]</code> 进度条是否有45度斜纹？<br>
+      <code>[ ]</code> 输入框聚焦是否有蓝色硬阴影？<br>
+      <code>[ ]</code> 是否加载了Poppins和Space Mono字体？</div>
+    </div>
+
+    <!-- AI智能体实施指令 -->
+    <div class="ai-prompt">
+      <div class="ai-label">AI AGENT IMPLEMENTATION PROMPT</div>
+      <div class="ai-content">
+        请将当前项目的整体UI样式修改为「孟菲斯·撞色」风格。具体操作如下：<br><br>
+        1. 在 <code>&lt;head&gt;</code> 中引入 Poppins + Space Mono 字体：<code>&lt;link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;family=Space+Mono:wght@400;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet"&gt;</code><br><br>
+        2. 将本文档第05节「全局样式表」的完整CSS代码注入项目的全局样式文件中（追加到末尾即可）。<br><br>
+        3. 将页面 <code>&lt;body&gt;</code> 的 font-family 设为 <code>'Poppins', 'Noto Sans SC', sans-serif</code>。<br><br>
+        4. 检查所有组件，确保以下规则生效：<br>
+        &nbsp;&nbsp;- 所有元素的 <code>border-radius</code> 改为 <code>0</code><br>
+        &nbsp;&nbsp;- 所有边框改为 <code>2px solid #1B1B1B</code><br>
+        &nbsp;&nbsp;- 卡片/面板添加 <code>box-shadow: 6px 6px 0 #FF6B35</code> 硬阴影<br>
+        &nbsp;&nbsp;- 按钮文字添加 <code>text-transform: uppercase; font-weight: 700</code><br>
+        &nbsp;&nbsp;- 表格表头改为 <code>background: #1B1B1B; color: #FFD23F</code><br>
+        &nbsp;&nbsp;- 表格偶数行改为 <code>background: #FFD23F</code><br>
+        &nbsp;&nbsp;- 进度条填充改为45度斜纹 <code>repeating-linear-gradient(45deg, #FF6B35, #FF6B35 6px, #FFD23F 6px, #FFD23F 12px)</code><br>
+        &nbsp;&nbsp;- 输入框聚焦态添加 <code>box-shadow: 4px 4px 0 #004E89</code><br>
+        &nbsp;&nbsp;- 主色 <code>#FF6B35</code>、强调色 <code>#004E89</code>、辅助黄 <code>#FFD23F</code><br><br>
+        5. 如果使用 Tailwind/Bootstrap 等框架，用 <code>!important</code> 或更高优先级选择器覆盖框架默认圆角和阴影。<br><br>
+        6. 移除所有渐变背景（进度条斜纹除外）、模糊阴影、圆角，替换为孟菲斯风格对应值。
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer class="footer">
+  <div class="container">
+    <p class="ft-brand">MEMPHIS POP UI DESIGN SYSTEM</p>
+    <p>课程进度自动生成系统 · 孟菲斯·撞色风格标准文档 v1.0</p>
+    <p>BOLD BORDER / HARD SHADOW / CLASH COLOR / ZERO RADIUS</p>
+  </div>
+</footer>
+
+
+</body></html>

@@ -43,20 +43,6 @@
     </div>
 
     <div class="panel" v-if="weeks.length">
-      <div class="panel-title">五周日期范围 <span class="cap">（每周二~周日，周一休息）</span></div>
-      <div class="wr">
-        <div v-for="(w, i) in weeks" :key="w.id" class="wr-item">
-          <div class="wr-label">第{{ i + 1 }}周</div>
-          <div class="wr-fields">
-            <n-input v-model:value="w.startMd" size="small" @blur="normalizeWeek(i)" />
-            <span class="wr-dash">-</span>
-            <n-input v-model:value="w.endMd" size="small" />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="panel">
       <div class="panel-title">进度表</div>
       <div class="panel-hint">课次默认为系统推荐，跨体系按衔接自动延续；点击课次可改为任意体系的课次、自定义或休课。</div>
 
@@ -93,7 +79,6 @@
               </td>
               <td>
                 <span class="tag accent">{{ row.nextSystem ? row.nextSystem.name : '—' }}</span>
-                <span v-if="row.done" class="tag danger">本月结业</span>
               </td>
             </tr>
             <tr v-if="!rows.length">
@@ -119,7 +104,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useMessage } from 'naive-ui'
-import { NButton, NInput, NSelect, NCheckbox } from 'naive-ui'
+import { NButton, NSelect, NCheckbox } from 'naive-ui'
 import { useStore } from '../stores/store'
 import CellEditor from '../components/CellEditor.vue'
 import { monthWeeks, fmtMD } from '../utils/date'
@@ -187,14 +172,6 @@ function calcWeeks() {
     endMd: x.endMd,
     days: x.days
   }))
-}
-
-function normalizeWeek(i) {
-  const w = weeks.value[i]
-  if (w) {
-    w.startMd = w.startMd || ''
-    w.endMd = w.endMd || ''
-  }
 }
 
 function generate() {
@@ -335,6 +312,13 @@ watch(teacherId, () => {
 .grid.gen td {
   vertical-align: top;
 }
+.grid.gen th,
+.grid.gen td {
+  white-space: nowrap;
+}
+.lesson .n-select {
+  min-width: 150px;
+}
 .lesson {
   min-width: 130px;
 }
@@ -348,34 +332,9 @@ watch(teacherId, () => {
   color: var(--muted);
   font-weight: 400;
 }
-.wr {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 8px;
-}
-.wr-item {
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 8px 10px;
-  font-size: 12px;
-  background: #fbfaf6;
-}
-.wr-label {
-  font-weight: 600;
-  color: var(--ink-2);
-  margin-bottom: 6px;
-  font-size: 12px;
-}
-.wr-fields {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.wr-fields .n-input {
-  flex: 1;
-}
-.wr-dash {
-  color: var(--muted);
+.grid.gen tbody tr:hover td .cell-date,
+.grid.gen tbody tr:hover td .date-none {
+  color: #fff;
 }
 .action-bar {
   display: flex;

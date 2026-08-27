@@ -60,19 +60,51 @@ const mobileOpen = ref(false)
 const theme = null
 const themeOverrides = {
   common: {
-    primaryColor: '#1f7a5c',
-    primaryColorHover: '#2f9a74',
-    primaryColorPressed: '#1a664e',
-    primaryColorSuppl: '#1f7a5c',
-    infoColor: '#1f7a5c',
-    infoColorHover: '#2f9a74',
-    infoColorPressed: '#1a664e',
-    successColor: '#2f9a5a',
-    warningColor: '#b8791f',
-    errorColor: '#cf3e3e',
-    borderRadius: '8px',
-    borderRadiusSmall: '6px',
-    fontFamily: "'PingFang SC', 'Microsoft YaHei', system-ui, 'Helvetica Neue', Arial, sans-serif"
+    primaryColor: '#FF6B35',
+    primaryColorHover: '#E55A2B',
+    primaryColorPressed: '#004E89',
+    primaryColorSuppl: '#FF6B35',
+    infoColor: '#FF6B35',
+    infoColorHover: '#E55A2B',
+    infoColorPressed: '#004E89',
+    successColor: '#1B9AAA',
+    warningColor: '#FFD23F',
+    errorColor: '#E55A2B',
+    borderColor: '#1B1B1B',
+    borderRadius: '0px',
+    borderRadiusSmall: '0px',
+    fontSize: '13px',
+    fontWeight: '600',
+    textColorBase: '#1B1B1B',
+    textColor1: '#1B1B1B',
+    textColor2: '#4A4A4A',
+    textColor3: '#9A9A9A',
+    fontFamily: "'Poppins', 'Noto Sans SC', sans-serif"
+  },
+  Button: {
+    borderRadiusMedium: '0px',
+    borderRadiusLarge: '0px',
+    fontWeight: '700',
+    textTransform: 'uppercase'
+  },
+  Card: {
+    borderRadius: '0px',
+    borderColor: '#1B1B1B'
+  },
+  Modal: {
+    borderRadius: '0px'
+  },
+  Input: {
+    borderRadius: '0px'
+  },
+  Select: {
+    borderRadius: '0px'
+  },
+  Dialog: {
+    borderRadius: '0px'
+  },
+  Tag: {
+    borderRadius: '0px'
   }
 }
 </script>
@@ -86,9 +118,8 @@ const themeOverrides = {
 .sidebar {
   width: 220px;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.82);
-  border-right: 1px solid var(--line);
-  backdrop-filter: blur(12px);
+  background: var(--memphis-text);
+  border-right: 2px solid var(--memphis-accent);
   display: flex;
   flex-direction: column;
   padding: 22px 14px 18px;
@@ -102,33 +133,37 @@ const themeOverrides = {
   align-items: center;
   gap: 12px;
   padding: 4px 6px 18px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.22);
   margin-bottom: 16px;
 }
 
 .mark {
   width: 38px;
   height: 38px;
-  border-radius: 9px;
-  background: var(--accent);
-  color: #fff;
+  border-radius: 0;
+  border: 2px solid var(--memphis-border);
+  background: var(--memphis-secondary);
+  color: var(--memphis-text);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .brand-name {
-  font-weight: 750;
+  font-weight: 800;
   font-size: 16px;
-  color: #1d2b25;
+  color: var(--memphis-secondary);
   line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .brand-sub {
   font-size: 10px;
   letter-spacing: 0.18em;
-  color: var(--muted);
+  color: var(--memphis-primary);
   font-family: var(--mono);
+  font-weight: 700;
 }
 
 .nav {
@@ -142,56 +177,52 @@ const themeOverrides = {
   align-items: center;
   gap: 11px;
   padding: 10px 11px;
-  border-radius: var(--radius-sm);
-  color: var(--ink-2);
+  border-radius: 0;
+  border-left: 4px solid transparent;
+  color: #AAA;
   font-size: 13.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   transition: all 0.14s;
   position: relative;
 }
 
 .nav-item .idx {
   font-size: 10px;
-  color: var(--muted);
+  color: #777;
   letter-spacing: 0.05em;
   font-variant-numeric: tabular-nums;
   font-family: var(--mono);
 }
 
 .nav-item:hover {
-  background: #f2f6f3;
-  color: var(--ink);
+  background: #2A2A2A;
+  color: var(--memphis-secondary);
 }
 
 .nav-item.router-link-active {
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-weight: 600;
+  background: var(--memphis-secondary);
+  color: var(--memphis-text);
+  border-left-color: var(--memphis-primary);
+  font-weight: 700;
 }
 
 .nav-item.router-link-active .idx {
-  color: var(--accent);
-  font-weight: 600;
-}
-
-.nav-item.router-link-active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 9px;
-  bottom: 9px;
-  width: 3px;
-  border-radius: 2px;
-  background: var(--accent);
+  color: var(--memphis-primary);
+  font-weight: 700;
 }
 
 .sidebar-foot {
   margin-top: auto;
   font-size: 11px;
-  color: var(--muted);
+  color: #666;
   padding: 6px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
   padding-top: 14px;
   letter-spacing: 0.02em;
+  font-family: var(--mono);
+  text-transform: uppercase;
 }
 
 .main {
@@ -220,9 +251,8 @@ const themeOverrides = {
     z-index: 60;
     height: 52px;
     padding: 0 14px;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--line);
+    background: var(--memphis-text);
+    border-bottom: 2px solid var(--memphis-accent);
   }
   .menu-btn {
     display: inline-flex;
@@ -230,26 +260,29 @@ const themeOverrides = {
     justify-content: center;
     width: 36px;
     height: 36px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: #fff;
-    color: var(--ink-2);
+    border: 2px solid var(--memphis-border);
+    border-radius: 0;
+    background: var(--memphis-secondary);
+    color: var(--memphis-text);
     cursor: pointer;
   }
   .menu-btn:hover {
-    color: var(--accent);
-    border-color: var(--accent);
+    color: var(--memphis-text);
+    border-color: var(--memphis-border);
+    background: var(--memphis-primary);
   }
   .topbar-title {
     font-size: 15px;
-    font-weight: 650;
-    color: var(--ink);
+    font-weight: 700;
+    color: var(--memphis-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
   .overlay {
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(30, 42, 34, 0.4);
+    background: rgba(27, 27, 27, 0.4);
     z-index: 70;
   }
   .sidebar {
@@ -263,7 +296,7 @@ const themeOverrides = {
     transform: translateX(-100%);
     transition: transform 0.22s ease;
     z-index: 80;
-    background: #fff;
+    background: var(--memphis-text);
   }
   .sidebar.open {
     transform: translateX(0);

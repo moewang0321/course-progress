@@ -59,6 +59,14 @@
             <div class="series-list">
               <div v-for="s in b.systems" :key="s.id" class="series">
                 <div class="series-head">
+                  <button
+                    class="toggle"
+                    :class="{ open: !isCollapsed(s.id) }"
+                    :aria-label="isCollapsed(s.id) ? '展开' : '折叠'"
+                    @click="toggleCollapse(s.id)"
+                  >
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg>
+                  </button>
                   <div class="head-left">
                     <b class="sys-name">{{ s.name }}</b>
                     <span class="tag">{{ s.stage }}</span>
@@ -68,6 +76,7 @@
                   <n-button size="small" secondary @click="openEdit(s)">编辑</n-button>
                 </div>
 
+                <div class="series-body" v-show="!isCollapsed(s.id)">
                 <div class="series-lessons">
                   <div v-for="(l, i) in s.lessons" :key="i" class="lesson-chip">
                     <i class="no">{{ i + 1 }}</i>
@@ -89,6 +98,7 @@
                   <span class="next-label">下期衔接</span>
                   <span class="next-arrow">→</span>
                   <span class="next-name">{{ nextName(s) }}</span>
+                </div>
                 </div>
               </div>
             </div>
@@ -198,6 +208,15 @@ const newSys = reactive({ stage: '学前', age: '', name: '', lessonText: '' })
 
 // 每个体系独立的"新增课次"输入框
 const inputMap = reactive({})
+
+// 折叠状态：true = 收起；默认展开
+const collapsed = reactive({})
+function toggleCollapse(id) {
+  collapsed[id] = !collapsed[id]
+}
+function isCollapsed(id) {
+  return !!collapsed[id]
+}
 
 const ages = computed(() => {
   let list = store.systems.map((s) => s.age)
@@ -337,12 +356,15 @@ function createSystem() {
 }
 .count-badge {
   font-size: 12px;
+  font-family: var(--mono);
+  font-weight: 700;
   color: var(--ink-2);
-  background: #f2f6f3;
-  border: 1px solid var(--line);
+  background: #fff;
+  border: 2px solid var(--memphis-border);
   padding: 2px 9px;
-  border-radius: 6px;
+  border-radius: 0;
   font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
 }
 
 /* ---------- 纵向分组卡片流 ---------- */
@@ -363,9 +385,10 @@ function createSystem() {
 }
 .stage-tag {
   font-size: 15px;
-  font-weight: 750;
+  font-weight: 800;
   letter-spacing: 0.04em;
-  color: #1d3a2d;
+  color: var(--ink);
+  text-transform: uppercase;
 }
 .stage-count {
   font-size: 12px;
@@ -402,7 +425,7 @@ function createSystem() {
   content: '';
   width: 14px;
   height: 3px;
-  border-radius: 2px;
+  border-radius: 0;
   background: var(--accent);
 }
 
@@ -414,14 +437,20 @@ function createSystem() {
 
 .series {
   background: #ffffff;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border: 2px solid var(--memphis-border);
+  border-radius: 0;
   overflow: hidden;
-  transition: border-color 0.16s, box-shadow 0.16s;
+  transition: transform 0.16s, box-shadow 0.16s;
+}
+.series:nth-child(odd) {
+  box-shadow: 5px 5px 0 var(--memphis-primary);
+}
+.series:nth-child(even) {
+  box-shadow: 5px 5px 0 var(--memphis-accent);
 }
 .series:hover {
-  border-color: var(--accent-2);
-  box-shadow: 0 6px 20px -16px rgba(30, 80, 60, 0.35);
+  transform: translate(2px, 2px);
+  box-shadow: 3px 3px 0 var(--memphis-border);
 }
 
 .series-head {
@@ -429,8 +458,33 @@ function createSystem() {
   align-items: center;
   gap: 12px;
   padding: 12px 18px;
-  border-bottom: 1px solid var(--line);
-  background: #fbfcfa;
+  border-bottom: 2px solid var(--memphis-border);
+  background: var(--memphis-surface-alt);
+}
+.toggle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 2px solid var(--memphis-border);
+  border-radius: 0;
+  background: #fff;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: color 0.12s, background 0.12s;
+}
+.toggle:hover {
+  color: var(--memphis-text);
+  background: var(--memphis-secondary);
+}
+.toggle svg {
+  transition: transform 0.18s ease;
+}
+.toggle.open svg {
+  transform: rotate(180deg);
 }
 .head-left {
   flex: 1;
@@ -465,21 +519,36 @@ function createSystem() {
   align-items: center;
   gap: 7px;
   padding: 6px 11px;
-  border: 1px solid var(--line);
-  background: #f6f8f5;
-  border-radius: 8px;
+  border: 1.5px solid var(--memphis-border);
+  background: #fff;
+  border-radius: 0;
   font-size: 12.5px;
   color: var(--ink-2);
   transition: border-color 0.12s;
 }
+.lesson-chip:nth-child(odd) {
+  background: #fff;
+}
+.lesson-chip:nth-child(even) {
+  background: var(--memphis-surface-alt);
+}
 .lesson-chip:hover {
-  border-color: rgba(31, 122, 92, 0.34);
+  background: var(--memphis-primary);
+  border-color: var(--memphis-border);
+  color: #fff;
+}
+.lesson-chip:hover .no {
+  color: var(--memphis-secondary);
+}
+.lesson-chip:hover .del {
+  color: #fff;
 }
 .lesson-chip .no {
   font-style: normal;
   font-size: 10.5px;
-  color: var(--accent);
+  color: var(--memphis-primary);
   font-family: var(--mono);
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 .lesson-chip .name {
@@ -516,26 +585,32 @@ function createSystem() {
   align-items: center;
   gap: 7px;
   padding: 9px 18px 10px;
-  border-top: 1px solid var(--line);
-  background: #f2f5f2;
+  border-top: 2px solid var(--memphis-border);
+  background: var(--memphis-secondary);
 }
 .next-label {
   font-size: 10.5px;
-  color: var(--muted);
+  color: var(--ink-2);
   letter-spacing: 0.06em;
+  font-family: var(--mono);
+  font-weight: 700;
+  text-transform: uppercase;
 }
 .next-arrow {
-  color: var(--accent);
+  color: var(--memphis-primary);
   font-size: 13px;
+  font-weight: 700;
 }
 .next-name {
   font-size: 12px;
-  color: var(--accent);
-  font-weight: 500;
+  color: var(--ink);
+  font-weight: 700;
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-family: var(--mono);
+  text-transform: uppercase;
 }
 .form-modal {
   width: min(480px, 92vw);

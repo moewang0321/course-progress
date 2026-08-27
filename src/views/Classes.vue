@@ -353,12 +353,15 @@ function save() {
 }
 .count-badge {
   font-size: 12px;
+  font-family: var(--mono);
+  font-weight: 700;
   color: var(--ink-2);
-  background: #f2f6f3;
-  border: 1px solid var(--line);
+  background: #fff;
+  border: 2px solid var(--memphis-border);
   padding: 2px 9px;
-  border-radius: 6px;
+  border-radius: 0;
   font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
 }
 .ops {
   display: inline-flex;
@@ -373,21 +376,30 @@ function save() {
 }
 .ptr .track {
   flex: 1;
-  height: 6px;
+  height: 8px;
   min-width: 90px;
-  border-radius: 3px;
-  background: #e4e9e5;
+  border: 1.5px solid var(--memphis-border);
+  border-radius: 0;
+  background: var(--memphis-surface-alt);
   overflow: hidden;
 }
 .ptr .fill {
   height: 100%;
-  background: var(--accent);
-  border-radius: 3px;
+  border-radius: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--memphis-primary),
+    var(--memphis-primary) 6px,
+    var(--memphis-secondary) 6px,
+    var(--memphis-secondary) 12px
+  );
 }
 .ptr .lbl {
   font-size: 11.5px;
   color: var(--ink-2);
   white-space: nowrap;
+  font-family: var(--mono);
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 .add-teacher-row {
@@ -416,15 +428,16 @@ function save() {
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: #f7f9f6;
+  border: 2px solid var(--memphis-border);
+  border-radius: 0;
+  background: #fff;
 }
 .t-avatar {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
-  background: var(--accent);
+  border-radius: 0;
+  border: 2px solid var(--memphis-border);
+  background: var(--memphis-accent);
   color: #fff;
   display: flex;
   align-items: center;
@@ -452,9 +465,9 @@ function save() {
   font-size: 12px;
 }
 .sync-row {
-  background: var(--accent-soft);
-  border: 1px dashed rgba(31, 122, 92, 0.4);
-  border-radius: 8px;
+  background: var(--memphis-secondary);
+  border: 2px dashed var(--memphis-border);
+  border-radius: 0;
   padding: 10px;
 }
 .sync {
