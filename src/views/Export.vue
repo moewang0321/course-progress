@@ -61,11 +61,12 @@
 
 <script setup>
 import { computed, onMounted } from 'vue'
-import { useMessage } from 'naive-ui'
+import { useDialog, useMessage } from 'naive-ui'
 import { NButton } from 'naive-ui'
 import { currentGen as g, restoreGen } from '../utils/session'
 
 const message = useMessage()
+const dialog = useDialog()
 
 onMounted(() => {
   restoreGen()
@@ -204,11 +205,25 @@ async function doExport() {
   document.body.removeChild(a)
   URL.revokeObjectURL(a.href)
 
-  if (g.writeBackPtr) {
-    const { useStore } = await import('../stores/store')
-    trackPointerWriteback(useStore())
-  }
   message.success('已导出：' + filename.value)
+
+  if (g.writeBackPtr) {
+    doWritebackConfirm()
+  }
+}
+
+function doWritebackConfirm() {
+  dialog.warning({
+    title: '回写课程进度',
+    content: '导出后按实际排课推进相关班级的课程进度，是否继续？',
+    positiveText: '回写',
+    negativeText: '取消',
+    onPositiveClick: async () => {
+      const { useStore } = await import('../stores/store')
+      trackPointerWriteback(useStore())
+      message.success('已推进相关班级进度')
+    }
+  })
 }
 
 function trackPointerWriteback(st) {

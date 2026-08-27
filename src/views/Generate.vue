@@ -35,10 +35,17 @@
           />
         </span>
         <n-button type="primary" @click="generate">生成进度表</n-button>
+        <n-button @click="saveDraft">保存草稿</n-button>
         <span class="cap">{{ status }}</span>
         <span v-if="current" class="status-inline">已载入 {{ current }} 的草稿</span>
         <span class="spacer"></span>
-        <n-button @click="saveDraft">保存草稿</n-button>
+        <n-button @click="goPreview">在线预览</n-button>
+        <n-button type="primary" @click="goExport">导出 Excel(.xlsx)</n-button>
+        <span class="cap">{{ filename }}</span>
+      </div>
+      <div class="toolbar-sub">
+        <n-checkbox v-model:checked="writeBackPtr">导出后按实际排课回写进度</n-checkbox>
+        <n-checkbox v-model:checked="keepCustom">自定义课次回写体系序列</n-checkbox>
       </div>
     </div>
 
@@ -86,16 +93,6 @@
             </tr>
           </tbody>
         </table>
-      </div>
-    </div>
-
-    <div class="panel action-bar">
-      <n-button @click="goPreview">在线预览</n-button>
-      <n-button type="primary" @click="goExport">导出 Excel(.xlsx)</n-button>
-      <span class="cap">文件名：{{ filename }}</span>
-      <div class="flex gap8 wrap" style="margin-top: 10px">
-        <n-checkbox v-model:checked="writeBackPtr">导出后按实际排课回写进度</n-checkbox>
-        <n-checkbox v-model:checked="keepCustom">自定义课次回写体系序列</n-checkbox>
       </div>
     </div>
   </div>
@@ -341,6 +338,16 @@ watch(teacherId, () => {
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
+}
+
+.toolbar-sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 10px;
+  border-top: 1px solid var(--memphis-border);
+  padding-top: 10px;
 }
 
 @media (max-width: 768px) {
