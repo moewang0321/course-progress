@@ -131,15 +131,27 @@
           本月（{{ year }} 年 {{ month }} 月）是否有休息 / 停课日期？若有请选择；
           所选日期当天上课的班级，本周休课，本月课程自动向后推延一周。
         </p>
-        <n-date-picker
-          v-model:value="restDates"
-          type="date"
-          multiple
-          :clearable="true"
-          class="rest-picker"
-          placeholder="选择休息日期（可多选）"
-        />
-        <div class="hint-tip">不选择任何日期直接生成，即视为本月无休息日。</div>
+        <div class="rest-add">
+          <n-date-picker
+            v-model:value="restPick"
+            type="date"
+            :clearable="true"
+            class="rest-picker"
+            placeholder="选择休息日期"
+          />
+          <n-button :disabled="!restPick" @click="addRest">添加</n-button>
+        </div>
+        <div class="rest-chips" v-if="restDates.length">
+          <n-tag
+            v-for="d in restDates"
+            :key="d"
+            closable
+            @close="removeRest(d)"
+            class="rest-chip"
+            >{{ restLabel(d) }}</n-tag
+          >
+        </div>
+        <div class="hint-tip">可多次选择并添加多个休息日；不添加直接生成，即视为本月无休息日。</div>
       </div>
       <template #footer>
         <div class="form-actions">
@@ -178,6 +190,20 @@ const writeBackPtr = ref(true)
 const keepCustom = ref(true)
 const restVisible = ref(false)
 const restDates = ref([])
+const restPick = ref(null)
+
+function restLabel(ts) {
+  const d = new Date(ts)
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
+}
+function addRest() {
+  if (!restPick.value) return
+  if (!restDates.value.includes(restPick.value)) restDates.value.push(restPick.value)
+  restPick.value = null
+}
+function removeRest(ts) {
+  restDates.value = restDates.value.filter((d) => d !== ts)
+}
 
 const years = computed(() => {
   const y = now.getFullYear()
@@ -458,7 +484,18 @@ tr.drag-over td {
   color: var(--ink-2);
 }
 .rest-picker {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
+}
+.rest-add {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.rest-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 .hint-tip {
   font-size: 12px;
