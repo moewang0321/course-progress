@@ -36,6 +36,7 @@
         </span>
         <n-button type="primary" @click="openGenerate">生成进度表</n-button>
         <n-button @click="saveDraft">保存草稿</n-button>
+        <n-button v-if="current" tertiary @click="deleteDraft">删除草稿</n-button>
         <span class="cap">{{ status }}</span>
         <span v-if="current" class="status-inline">已载入 {{ current }} 的草稿</span>
         <span class="spacer"></span>
@@ -320,6 +321,15 @@ function saveDraft() {
   store.persist()
   current.value = draftKey
   message.success('草稿已保存')
+}
+
+function deleteDraft() {
+  if (!current.value) return
+  const draftKey = current.value
+  delete store.drafts[draftKey]
+  store.persist()
+  current.value = ''
+  message.success('草稿已删除')
 }
 
 const dragId = ref('')
