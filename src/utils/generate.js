@@ -47,26 +47,45 @@ export function takeLessons(system, ptr, getSys, count) {
   return { lessons, done }
 }
 
+// 统一为 "年-月-日" 键，用于判定某天是否休息
+function keyOf(d) {
+  const dt = new Date(d)
+  return `${dt.getFullYear()}-${dt.getMonth() + 1}-${dt.getDate()}`
+}
+
 /**
  * 构建一行进度表可编辑结构。
  * @param {object} cls 班级
  * @param {object} system 体系
  * @param {Array} weeks 课周数组
  * @param {function} getSys 通过体系 id 取体系（用于走衔接链）
+ * @param {object} opts
+ * @param {Array<string|Date|number>} [opts.holidays] 本月休息/停课日期，选中该天的班级当周休课，课程向后顺延
  */
-export function buildRow(cls, system, weeks, getSys) {
-  const { lessons, done } = takeLessons(system, cls.ptr || 0, getSys, weeks.length)
-  const nextSystem = system.nextId ? getSys(system.nextId) : null
-  const cells = weeks.map((w, i) => {
+export function buildRow(cls, system, weeks, getSys, opts = {}) {
+  const holidayKeys = new Set((opts.holidays || []).map((h) => keyOf(h)))
+
+  // 先逐个判定每周是否休息（该班实际上课那天落在休息日 → 该周休课）
+  const planned = weeks.map((w, i) => {
     const date = pickDate(w, cls.time)
-    return {
-      id: `${cls.id}-w${i}`,
-      week: i,
-      date,
-      label: date ? fmtMD(date) : '',
-      lesson: lessons[i] || ''
-    }
+    const off = date ? holidayKeys.has(keyOf(date)) : false
+    return { i, date, label: date ? fmtMD(date) : '', off }
   })
+
+  // 仅在"非休息周"安排课次，休息周会让后序课程整体顺延一周
+  const onWeeks = planned.filter((p) => !p.off)
+  const { lessons, done } = takeLessons(system, cls.ptr || 0, getSys, onWeeks.length)
+
+  const nextSystem = system.nextId ? getSys(system.nextId) : null
+  let lessonIdx = 0
+  const cells = planned.map((p) => ({
+    id: `${cls.id}-w${p.i}`,
+    week: p.i,
+    date: p.date,
+    label: p.label,
+    lesson: p.off ? '' : (lessons[lessonIdx++] || ''),
+    rest: p.off
+  }))
   return {
     classId: cls.id,
     cls,

@@ -34,7 +34,7 @@
             @update:value="(v) => (month = v)"
           />
         </span>
-        <n-button type="primary" @click="generate">生成进度表</n-button>
+        <n-button type="primary" @click="openGenerate">生成进度表</n-button>
         <n-button @click="saveDraft">保存草稿</n-button>
         <span class="cap">{{ status }}</span>
         <span v-if="current" class="status-inline">已载入 {{ current }} 的草稿</span>
@@ -57,6 +57,7 @@
         <table class="grid gen">
           <thead>
             <tr>
+              <th class="drag-th">排序</th>
               <th>课程名称</th>
               <th>年龄</th>
               <th>时间</th>
@@ -68,7 +69,24 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="row in rows" :key="row.classId">
+            <tr
+              v-for="row in rows"
+              :key="row.classId"
+              :class="{ 'drag-over': dragOver === row.classId }"
+            >
+              <td class="drag-cell">
+                <span
+                  class="drag-handle"
+                  draggable="true"
+                  :title="'按住拖动调整排序'"
+                  @dragstart="onDragStart($event, row.classId)"
+                  @dragend="onDragEnd"
+                  @dragover.prevent
+                  @dragenter.prevent="dragOver = row.classId"
+                  @drop.prevent="onDrop($event, row.classId)"
+                  >⠿</span
+                >
+              </td>
               <td><b>{{ row.cls.courseLabel }}</b></td>
               <td>{{ row.cls.age }}</td>
               <td>{{ row.cls.time }}</td>
@@ -77,7 +95,11 @@
               <td>{{ row.cls.count }}</td>
               <td class="lesson" v-for="(cell, wi) in row.cells" :key="cell.id">
                 <div class="cell-date">{{ cell.label }}<span v-if="!cell.label" class="date-none">无课</span></div>
+                <template v-if="cell.rest">
+                  <span class="tag rest-tag">休课</span>
+                </template>
                 <CellEditor
+                  v-else
                   :groups="allLessonGroups"
                   :model-value="cell.lesson"
                   @update:model-value="(v) => setLesson(row, wi, v)"
@@ -89,19 +111,50 @@
               </td>
             </tr>
             <tr v-if="!rows.length">
-              <td colspan="12" class="empty">请先选择教师并点击生成</td>
+              <td colspan="13" class="empty">请先选择教师并点击生成</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
+
+    <!-- 休息日确认弹窗：生成前询问本月是否有休息/停课日期 -->
+    <n-modal
+      v-model:show="restVisible"
+      preset="card"
+      class="form-modal rest-modal"
+      title="休息日确认"
+      :bordered="false"
+    >
+      <div class="rest-box">
+        <p class="rest-desc">
+          本月（{{ year }} 年 {{ month }} 月）是否有休息 / 停课日期？若有请选择；
+          所选日期当天上课的班级，本周休课，本月课程自动向后推延一周。
+        </p>
+        <n-date-picker
+          v-model:value="restDates"
+          type="date"
+          multiple
+          :clearable="true"
+          class="rest-picker"
+          placeholder="选择休息日期（可多选）"
+        />
+        <div class="hint-tip">不选择任何日期直接生成，即视为本月无休息日。</div>
+      </div>
+      <template #footer>
+        <div class="form-actions">
+          <n-button @click="restVisible = false">取消</n-button>
+          <n-button type="primary" @click="doGenerate">生成进度表</n-button>
+        </div>
+      </template>
+    </n-modal>
   </div>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useMessage } from 'naive-ui'
-import { NButton, NSelect, NCheckbox } from 'naive-ui'
+import { NButton, NSelect, NCheckbox, NModal, NDatePicker } from 'naive-ui'
 import { useStore } from '../stores/store'
 import CellEditor from '../components/CellEditor.vue'
 import { monthWeeks, fmtMD } from '../utils/date'
@@ -123,6 +176,8 @@ const weeks = ref([])
 const rows = ref([])
 const writeBackPtr = ref(true)
 const keepCustom = ref(true)
+const restVisible = ref(false)
+const restDates = ref([])
 
 const years = computed(() => {
   const y = now.getFullYear()
@@ -171,7 +226,14 @@ function calcWeeks() {
   }))
 }
 
-function generate() {
+function openGenerate() {
+  restDates.value = []
+  restVisible.value = true
+}
+
+function doGenerate() {
+  restVisible.value = false
+  const holidays = restDates.value.map((t) => new Date(t))
   calcWeeks()
   rows.value = []
   current.value = ''
@@ -179,7 +241,7 @@ function generate() {
   for (const c of cls) {
     const sys = store.sysById(c.sysId)
     if (!sys) continue
-    const row = buildRow(c, sys, weeks.value, store.sysById)
+    const row = buildRow(c, sys, weeks.value, store.sysById, { holidays })
     rows.value.push(row)
   }
   status.value = `已生成 ${rows.value.length} 个班级`
@@ -232,6 +294,31 @@ function saveDraft() {
   store.persist()
   current.value = draftKey
   message.success('草稿已保存')
+}
+
+const dragId = ref('')
+const dragOver = ref('')
+function onDragStart(e, id) {
+  dragId.value = id
+  e.dataTransfer.effectAllowed = 'move'
+  if (e.dataTransfer.setData) e.dataTransfer.setData('text/plain', id)
+}
+function onDragEnd() {
+  dragId.value = ''
+  dragOver.value = ''
+}
+function onDrop(e, targetId) {
+  const id = dragId.value || (e.dataTransfer && e.dataTransfer.getData('text/plain'))
+  dragId.value = ''
+  dragOver.value = ''
+  if (!id || id === targetId) return
+  store.moveClass(id, targetId)
+  const from = rows.value.findIndex((r) => r.classId === id)
+  const to = rows.value.findIndex((r) => r.classId === targetId)
+  if (from >= 0 && to >= 0) {
+    const [item] = rows.value.splice(from, 1)
+    rows.value.splice(to, 0, item)
+  }
 }
 
 function pushToSession() {
@@ -332,6 +419,54 @@ watch(teacherId, () => {
 .grid.gen tbody tr:hover td .cell-date,
 .grid.gen tbody tr:hover td .date-none {
   color: #fff;
+}
+.drag-th {
+  width: 44px;
+  text-align: center;
+}
+.drag-cell {
+  text-align: center;
+}
+.drag-handle {
+  cursor: grab;
+  color: var(--muted);
+  font-size: 14px;
+  user-select: none;
+  padding: 2px 6px;
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+tr.drag-over .drag-handle {
+  color: var(--memphis-primary);
+}
+tr.drag-over td {
+  background: var(--memphis-secondary);
+  box-shadow: inset 0 2px 0 var(--memphis-primary), inset 0 -2px 0 var(--memphis-primary);
+}
+.rest-modal {
+  width: min(440px, 92vw);
+}
+.rest-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rest-desc {
+  margin: 0;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+.rest-picker {
+  width: 100%;
+}
+.hint-tip {
+  font-size: 12px;
+  color: var(--muted);
+}
+.rest-tag {
+  border-color: var(--memphis-secondary);
+  color: var(--ink-2);
 }
 .action-bar {
   display: flex;

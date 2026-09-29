@@ -28,6 +28,7 @@
         <table class="grid">
           <thead>
             <tr>
+              <th class="drag-th">排序</th>
               <th>课程名称</th>
               <th>年龄</th>
               <th>上课时间</th>
@@ -41,7 +42,24 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="c in visibleClasses" :key="c.id">
+            <tr
+              v-for="c in visibleClasses"
+              :key="c.id"
+              :class="{ 'drag-over': dragOver === c.id }"
+            >
+              <td class="drag-cell">
+                <span
+                  class="drag-handle"
+                  draggable="true"
+                  :title="'按住拖动调整排序'"
+                  @dragstart="onDragStart($event, c.id)"
+                  @dragend="onDragEnd"
+                  @dragover.prevent
+                  @dragenter.prevent="dragOver = c.id"
+                  @drop.prevent="onDrop($event, c.id)"
+                  >⠿</span
+                >
+              </td>
               <td><b>{{ c.courseLabel }}</b></td>
               <td>{{ c.age }}</td>
               <td>{{ c.time }}</td>
@@ -254,6 +272,25 @@ function nextLesson(c) {
 function advance(c) {
   store.advanceClass(c.id)
 }
+
+const dragId = ref('')
+const dragOver = ref('')
+function onDragStart(e, id) {
+  dragId.value = id
+  e.dataTransfer.effectAllowed = 'move'
+  if (e.dataTransfer.setData) e.dataTransfer.setData('text/plain', id)
+}
+function onDragEnd() {
+  dragId.value = ''
+  dragOver.value = ''
+}
+function onDrop(e, targetId) {
+  const id = dragId.value || (e.dataTransfer && e.dataTransfer.getData('text/plain'))
+  dragId.value = ''
+  dragOver.value = ''
+  if (!id || id === targetId) return
+  store.moveClass(id, targetId)
+}
 function askDelClass(c) {
   dialog.warning({
     title: '删除班级',
@@ -368,6 +405,30 @@ function save() {
   align-items: center;
   gap: 8px;
   white-space: nowrap;
+}
+.drag-th {
+  width: 44px;
+  text-align: center;
+}
+.drag-cell {
+  text-align: center;
+}
+.drag-handle {
+  cursor: grab;
+  color: var(--muted);
+  font-size: 14px;
+  user-select: none;
+  padding: 2px 6px;
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+tr.drag-over .drag-handle {
+  color: var(--memphis-primary);
+}
+tr.drag-over td {
+  background: var(--memphis-secondary);
+  box-shadow: inset 0 2px 0 var(--memphis-primary), inset 0 -2px 0 var(--memphis-primary);
 }
 .ptr {
   display: flex;

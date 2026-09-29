@@ -236,6 +236,14 @@ export const useStore = defineStore('main', {
       this.classes = this.classes.filter((c) => c.id !== id)
       this.persist()
     },
+    moveClass(id, beforeId) {
+      const from = this.classes.findIndex((c) => c.id === id)
+      if (from < 0) return
+      const [item] = this.classes.splice(from, 1)
+      const to = beforeId ? this.classes.findIndex((c) => c.id === beforeId) : -1
+      this.classes.splice(to === -1 ? this.classes.length : to, 0, item)
+      this.persist()
+    },
     advanceClass(id, step = 1) {
       const c = this.classes.find((x) => x.id === id)
       if (!c) return
